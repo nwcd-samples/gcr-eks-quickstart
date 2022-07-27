@@ -8,7 +8,6 @@
 
 - 使用AWS Fargate在Amazon EKS中部署一个基于微服务的应用程序
 - 配置一个App Mesh虚拟网关，将流量路由到应用服务
-- 使用App Mesh创建一个金丝雀部署
 - 启用App Mesh的可观察性功能，包括为Fargate、Amazon Cloudwatch Container Insights和AWS X-Ray追踪提供日志记录。
 
 ## 1. EKS Fargate和可观测性设置
