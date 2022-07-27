@@ -150,13 +150,13 @@ eksctl create iamserviceaccount \
 使用 Helm V3 或更高版本或通过应用 Kubernetes 清单来安装 Amazon Load Balancer Controller.
 
 #### 2.2.1 Helm部署
-1.添加 eks-charts 存储库
+1.添加 eks-charts Repo
 
 ```
 helm repo add eks https://aws.github.io/eks-charts
 ```
 
-2.更新您的本地存储库, 以确保您拥有最新的图表
+2.更新您的Repo, 以确保正确的部署进行后续步骤
 
 ```
 helm repo update
