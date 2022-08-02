@@ -1,5 +1,5 @@
-# GCR EKS Workshop 2022
-## AWS中国区域EKS动手实验集
+# GCR EKS QuickStart 2022
+## AWS中国区域EKS快速启动实验集
 
 在此教程中，您将完成以下动手实验：
 
