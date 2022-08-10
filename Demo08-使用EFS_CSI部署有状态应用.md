@@ -46,7 +46,7 @@ eksctl create iamserviceaccount \
 
 ```
 kubectl kustomize \
-    "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.3" > public-ecr-driver.yaml
+    "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.4" > public-ecr-driver.yaml
 ```
 2.2 修改驱动程序配置文件，去掉Service Account部分
 
