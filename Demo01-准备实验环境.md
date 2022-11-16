@@ -152,8 +152,8 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 ## 4. EKS IAM 所需权限
 参考文档:
-[https://docs.amazonaws.cn/eks/latest/userguide/security-iam.html](https://docs.amazonaws.cn/eks/latest/userguide/security-iam.html)
-[https://eksctl.io/usage/minimum-iam-policies/](https://eksctl.io/usage/minimum-iam-policies/)
+<br>[https://docs.amazonaws.cn/eks/latest/userguide/security-iam.html](https://docs.amazonaws.cn/eks/latest/userguide/security-iam.html)
+<br>[https://github.com/toreydai/eksctl-min-iam-policies-cn](https://github.com/toreydai/eksctl-min-iam-policies-cn)
 
 * AmazonEC2FullAccess (AWS Managed Policy)
 * EksAllAccess
