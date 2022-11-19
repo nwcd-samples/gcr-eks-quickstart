@@ -168,10 +168,10 @@ Helm安装参考文档: [https://docs.amazonaws.cn/eks/latest/userguide/helm.htm
 
 ```
 #北京区Controller Image地址
-918309763551.dkr.ecr.cn-north-1.amazonaws.com.cn/amazon/aws-load-balancer-controller:2.4.0
+918309763551.dkr.ecr.cn-north-1.amazonaws.com.cn/amazon/aws-load-balancer-controller
 
 #宁夏区Controller Image地址
-961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/amazon/aws-load-balancer-controller:2.4.0
+961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/amazon/aws-load-balancer-controller
 
 AWS_REGION='cn-northwest-1'
 CLUSTER_NAME='eksworkshop'
