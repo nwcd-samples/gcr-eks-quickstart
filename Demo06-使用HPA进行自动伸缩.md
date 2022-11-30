@@ -12,7 +12,7 @@ Metrics Server是Kubernetes内置自动缩放pipelines的可扩展、高效的�
 a. 下载metrics-server安装文件到本地：
 
 ```
-wegt https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
 ```
 
 b. 使用Kubernetes mutating admission webhook自动更换Kubernetes Pod的容器镜像
