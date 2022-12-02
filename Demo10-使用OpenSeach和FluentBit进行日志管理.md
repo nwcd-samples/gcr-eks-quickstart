@@ -136,6 +136,10 @@ kubectl --namespace=logging get pods
 NAME               READY   STATUS    RESTARTS   AGE
 fluent-bit-9kqwf   1/1     Running   0          16s
 fluent-bit-svrw2   1/1     Running   0          15s
+
+# 如果出现如下报错，需要修改fluentbit.yaml文件，并在output-elasticsearch.conf段落里设置AWS_Region的值
+[2022/12/02 11:22:22] [  Error] File output-elasticsearch.conf
+[2022/12/02 11:22:22] [  Error] Error in line 8: Key has an empty value
 ```
 
 ## 7. Opensearch Dashboards
