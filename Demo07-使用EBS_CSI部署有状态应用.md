@@ -2,6 +2,7 @@
 --
 #### Contributor: Tao Dai
 --
+### 更新20221204：建议使用EKS Add-ons安装
 
 ### 先决条件
 为集群创建IAM OIDC提供商
