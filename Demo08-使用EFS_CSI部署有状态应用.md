@@ -215,6 +215,15 @@ kubectl delete -f pod.yaml
 # 删除EFS CSI驱动程序
 kubectl delete -f pod.yaml
 
+# 删除EFS Mount Targets
+aws efs describe-mount-targets \
+  --file-system-id $file_system_id \
+  --region $AWS_REGION
+
+aws efs delete-mount-target \
+  --mount-target-id mount-targets-id \
+  --region $AWS_REGION
+
 # 删除EFS文件系统
 aws efs delete-file-system \
     --file-system-id $file_system_id
@@ -227,16 +236,3 @@ eksctl delete iamserviceaccount \
 # 删除IAM Policy
 aws iam delete-policy --policy-arn $POLICY_ARN
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
