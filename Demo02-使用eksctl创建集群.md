@@ -274,18 +274,8 @@ ip-192-168-66-163.cn-northwest-1.compute.internal   NotReady   <none>   4s     v
 ```
 
 ## 4. 镜像处置(针对中国区)
-由于防火墙或安全限制，海外gcr.io, quay.io的镜像可能无法下载，为了不手动修改原始yaml文件的镜像路径，可以使用 [amazon-api-gateway-mutating-webhook-for-k8](https://github.com/aws-samples/amazon-api-gateway-mutating-webhook-for-k8) 项目实现镜像自动映射, 本workshop所需要的镜像已经由nwcdlabs/container-mirror准备好了，直接部署MutatingWebhookConfiguration即可。
-
-**注意：China region EKS service 有2个官方的账号id**
-cn-northwest-1   961992271922
-cn-north-1           91830976355
-因此如果你需要下载EKS 官方的镜像，需要正确使用上面的两个id
+由于防火墙或安全限制，海外gcr.io，quay.io的镜像可能无法下载，为了不手动修改原始yaml文件的镜像路径，可以使用 [Kubernetes mutating admission webhook](https://github.com/nwcdlabs/container-mirror/blob/master/webhook/README.md) 项目实现镜像自动映射，直接参照如下命令部署即可
 
 ```
-#例如宁夏区
-#aws-efs-csi-driver
-961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/eks/aws-efs-csi-driver
-
-#aws-ebs-csi-driver
-961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/eks/aws-ebs-csi-driver
+kubectl apply -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
 ```
