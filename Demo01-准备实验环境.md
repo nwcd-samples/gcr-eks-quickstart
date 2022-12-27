@@ -104,6 +104,10 @@ $eksctl version
 ```
 
 ## 3.kubectl
+**建议保持与集群版本一致的kubectl, 避免由于K8S版本更新较快导致的后续实验报错**
+**如K8S针对 v1alpha和v1beta的deprecated**
+
+
 参考链接: [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 ### 3.1 Mac系统安装
