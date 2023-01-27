@@ -69,7 +69,7 @@ aws iam create-policy \
 eksctl create iamserviceaccount --cluster eks0714 \
   --namespace prodcatalog-ns \
   --name prodcatalog-envoy-proxies \
-  --attach-policy-arn arn:aws:iam::$ACCOUNT_ID:policy/ProdEnvoyNamespaceIAMPolicy \
+  --attach-policy-arn arn:aws-cn:iam::$ACCOUNT_ID:policy/ProdEnvoyNamespaceIAMPolicy \
   --override-existing-serviceaccounts \
   --approve 
 ```	
@@ -241,7 +241,7 @@ https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insigh
 创建fluentd
 
 ```	
-kubectl -f cwagent-fluentd-quickstart.yaml 
+kubectl apply -f cwagent-fluentd-quickstart.yaml 
 
 ```	
 输出显示：
