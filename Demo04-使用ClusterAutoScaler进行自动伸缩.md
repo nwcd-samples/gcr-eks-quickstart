@@ -32,10 +32,10 @@ aws autoscaling \
 -----------------------------------------------------------------------
 |                      DescribeAutoScalingGroups                      |
 +------------------------------------------------------+----+----+----+
-|  eks-nodegroup-0ec0ebf0-fa82-89de-7f5f-f4dbdd42bee4  |  3 |  3 |  3 |
+|  eks-nodegroup-0ec0ebf0-fa82-89de-7f5f-f4dbdd42bee4  |  1 |  2 |  1 |
 +------------------------------------------------------+----+----+----+
 
-目前最大值是3
+目前最大值是2
 ```
 
 ### 1.2 修改最大值参数，修改为4
@@ -52,8 +52,8 @@ export ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query "AutoScal
 aws autoscaling \
     update-auto-scaling-group \
     --auto-scaling-group-name ${ASG_NAME} \
-    --min-size 3 \
-    --desired-capacity 3 \
+    --min-size 1 \
+    --desired-capacity 2 \
     --max-size 4
 ```
 3  检查新的数值
@@ -71,7 +71,7 @@ aws autoscaling \
 -----------------------------------------------------------------------
 |                      DescribeAutoScalingGroups                      |
 +------------------------------------------------------+----+----+----+
-|  eks-nodegroup-0ec0ebf0-fa82-89de-7f5f-f4dbdd42bee4  |  3 |  4 |  3 |
+|  eks-nodegroup-0ec0ebf0-fa82-89de-7f5f-f4dbdd42bee4  |  1 |  4 |  1 |
 +------------------------------------------------------+----+----+----+
 
 目前最大的数值为4
@@ -203,7 +203,8 @@ wget https://www.eksworkshop.com/beginner/080_scaling/deploy_ca.files/cluster-au
 修改 cluster-autoscaler-autodiscover.yaml,将ekscluster name(eksworkshop-eksctl)替换成创建的ekscluster name(eks0707)
 
 ```
-sed -i '_bak' 's/eksworkshop-eksctl/eks0714/g' cluster-autoscaler-autodiscover.yaml
+sed -i 's/eksworkshop-eksctl/eks0714/g' cluster-autoscaler-autodiscover.yaml
+sed -i 's/cluster-autoscaler:v1.20.3/cluster-autoscaler:v1.20.0/g' cluster-autoscaler-autodiscover.yaml
 ```
 创建CA
 
@@ -229,15 +230,7 @@ kubectl -n kube-system \
     cluster-autoscaler.kubernetes.io/safe-to-evict="false"
 ```
 
-### 3.3 设置autoscaler镜像文件
-
-```
-kubectl -n kube-system \
-    set image deployment.apps/cluster-autoscaler \
-    cluster-autoscaler=k8s.gcr.io/autoscaling/cluster-autoscaler:v1.22.0
-```
-
-### 3.4 观察CA日志
+### 3.3 观察CA日志
 
 ```
 kubectl -n kube-system logs -f deployment/cluster-autoscaler
@@ -359,9 +352,9 @@ export ASG_NAME=$(aws autoscaling describe-auto-scaling-groups --query "AutoScal
 aws autoscaling \
   update-auto-scaling-group \
   --auto-scaling-group-name ${ASG_NAME} \
-  --min-size 3 \
-  --desired-capacity 3 \
-  --max-size 3
+  --min-size 1 \
+  --desired-capacity 1 \
+  --max-size 4
 
 # 删除文件夹
 rm -rf ~/cluster-autoscaler
