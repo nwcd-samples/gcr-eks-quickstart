@@ -1,6 +1,8 @@
 # Demo12-使用CodePipeline进行CICD
 --
 #### Contributor: Zhengyu Ren
+#### 更新时间: 2023-08-09
+#### 基于EKS版本: EKS 1.27
 --
 ## 1. 创建IAM 角色
 在AWS CodePipeline中, 我们将使用AWS CodeBuild部署示例Kubernetes服务。
@@ -154,12 +156,15 @@ EOF
 ### 4.2 创建CodeBuild
 
 ```
+# 配置CodeBuild的信任策略
 CODEBUILD_TRUST="{\"Version\": \"2012-10-17\",\"Statement\": [{\"Effect\": \"Allow\",\"Principal\": {\"Service\": \"codebuild.amazonaws.com\"},\"Action\": \"sts:AssumeRole\"}]}"
 
+# 配置CodeBuild的角色
 aws iam create-role --role-name EksWorkshopCodeBuild \
 --assume-role-policy-document "$CODEBUILD_TRUST" \
 --output text --query 'Role.Arn'
 
+# 配置CodeBuild对应的IAM策略
 aws iam put-role-policy --role-name EksWorkshopCodeBuild \
  --policy-name codebuild --policy-document file://code_build.json
 
@@ -264,6 +269,7 @@ cat << EOF > iam_codepipeline_policy.json
 EOF
 
 # 创建S3存储桶
+**如下<S3_BUKCET>请自行设定一个名称**
 aws s3api create-bucket --bucket <S3_BUCKET> \
  --region cn-northwest-1 \
  --create-bucket-configuration LocationConstraint=cn-northwest-1
@@ -362,7 +368,11 @@ EOF
 # 创建pipeline
 aws codepipeline create-pipeline --cli-input-json file://codepipeline.json
 ```
+**此时可以登陆控制台或CLI查看CodePipeline的情况, 正常情况下会有一个正常执行中的操作**
+
 **由于网络问题可能出现报错在CodeBuild节点, 选择重试即可**
+**受制于网络情况, 有可能需要多次尝试**
+
 
 ## 6. 触发新发布
 修改main.go文件的18行内容
@@ -406,6 +416,11 @@ aws ecr delete-repository \
 # 删除S3存储桶
 aws s3 rm s3://<S3_BUCKET> --recursive
 aws s3api delete-bucket --region cn-northwest-1 --bucket <S3_BUCKET>
+
+# 删除IAM Role关联的Inline Policy
+aws iam delete-role-policy --role-name EksWorkshopCodeBuild --policy-name codebuild
+aws iam delete-role-policy --role-name EksWorkshopCodeBuildKubectlRole --policy-name eks-describe
+aws iam delete-role-policy --role-name EksWorkshopCodePipleLine --policy-name codepipeline
 
 # 删除IAM Role
 aws iam delete-role --role-name EksWorkshopCodeBuild
