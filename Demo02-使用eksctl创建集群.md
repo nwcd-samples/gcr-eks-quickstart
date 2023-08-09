@@ -21,57 +21,65 @@ CLUSTER_NAME=eksworkshop
 #参数说明
 #--node-type 工作节点类型 默认为m5.large
 #--nodes 工作节点数量 默认为2
+#--version 这里以1.27版本为例
 
-eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --alb-ingress-access --region=${AWS_REGION}
+eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --alb-ingress-access --region=${AWS_REGION} --version 1.27
 ```
 
 参考输出
 
 ```
-2022-07-10 20:12:28 [ℹ]  eksctl version 0.105.0-dev+aa76f1d4.2022-07-08T14:38:11Z
-2022-07-10 20:12:28 [ℹ]  using region cn-northwest-1
-2022-07-10 20:12:28 [ℹ]  setting availability zones to [cn-northwest-1c cn-northwest-1b cn-northwest-1a]
-2022-07-10 20:12:28 [ℹ]  subnets for cn-northwest-1c - public:192.168.0.0/19 private:192.168.96.0/19
-2022-07-10 20:12:28 [ℹ]  subnets for cn-northwest-1b - public:192.168.32.0/19 private:192.168.128.0/19
-2022-07-10 20:12:28 [ℹ]  subnets for cn-northwest-1a - public:192.168.64.0/19 private:192.168.160.0/19
-2022-07-10 20:12:28 [ℹ]  nodegroup "ng-2e67ae8c" will use "" [AmazonLinux2/1.22]
-2022-07-10 20:12:28 [ℹ]  using Kubernetes version 1.22
-2022-07-10 20:12:28 [ℹ]  creating EKS cluster "eksworkshop" in "cn-northwest-1" region with managed nodes
-2022-07-10 20:12:28 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
-2022-07-10 20:12:28 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=cn-northwest-1 --cluster=eksworkshop'
-2022-07-10 20:12:28 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "eksworkshop" in "cn-northwest-1"
-2022-07-10 20:12:28 [ℹ]  CloudWatch logging will not be enabled for cluster "eksworkshop" in "cn-northwest-1"
-2022-07-10 20:12:28 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=cn-northwest-1 --cluster=eksworkshop'
-2022-07-10 20:12:28 [ℹ]
+2023-08-09 10:43:05 [ℹ]  eksctl version 0.151.0-dev+3a7085814.2023-08-04T10:18:44Z
+2023-08-09 10:43:05 [ℹ]  using region cn-northwest-1
+2023-08-09 10:43:06 [ℹ]  setting availability zones to [cn-northwest-1a cn-northwest-1c cn-northwest-1b]
+2023-08-09 10:43:06 [ℹ]  subnets for cn-northwest-1a - public:192.168.0.0/19 private:192.168.96.0/19
+2023-08-09 10:43:06 [ℹ]  subnets for cn-northwest-1c - public:192.168.32.0/19 private:192.168.128.0/19
+2023-08-09 10:43:06 [ℹ]  subnets for cn-northwest-1b - public:192.168.64.0/19 private:192.168.160.0/19
+2023-08-09 10:43:06 [ℹ]  nodegroup "ng-fc4b07eb" will use "" [AmazonLinux2/1.27]
+2023-08-09 10:43:06 [ℹ]  using Kubernetes version 1.27
+2023-08-09 10:43:06 [ℹ]  creating EKS cluster "eksworkshop" in "cn-northwest-1" region with managed nodes
+2023-08-09 10:43:06 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
+2023-08-09 10:43:06 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=cn-northwest-1 --cluster=eksworkshop'
+2023-08-09 10:43:06 [ℹ]  Kubernetes API endpoint access will use default of {publicAccess=true, privateAccess=false} for cluster "eksworkshop" in "cn-northwest-1"
+2023-08-09 10:43:06 [ℹ]  CloudWatch logging will not be enabled for cluster "eksworkshop" in "cn-northwest-1"
+2023-08-09 10:43:06 [ℹ]  you can enable it with 'eksctl utils update-cluster-logging --enable-types={SPECIFY-YOUR-LOG-TYPES-HERE (e.g. all)} --region=cn-northwest-1 --cluster=eksworkshop'
+2023-08-09 10:43:06 [ℹ]
 2 sequential tasks: { create cluster control plane "eksworkshop",
     2 sequential sub-tasks: {
         wait for control plane to become ready,
-        create managed nodegroup "ng-2e67ae8c",
+        create managed nodegroup "ng-fc4b07eb",
     }
 }
-2022-07-10 20:12:28 [ℹ]  building cluster stack "eksctl-eksworkshop-cluster"
-2022-07-10 20:12:30 [ℹ]  deploying stack "eksctl-eksworkshop-cluster"
-2022-07-10 20:13:00 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
-2022-07-10 20:23:37 [ℹ]  building managed nodegroup stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:23:37 [ℹ]  deploying stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:23:37 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:24:08 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:24:47 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:26:00 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:26:55 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-2e67ae8c"
-2022-07-10 20:26:55 [ℹ]  waiting for the control plane availability...
-2022-07-10 20:26:56 [✔]  saved kubeconfig as "/Users/zeno/.kube/config"
-2022-07-10 20:26:56 [ℹ]  no tasks
-2022-07-10 20:26:56 [✔]  all EKS cluster resources for "eksworkshop" have been created
-2022-07-10 20:26:56 [ℹ]  nodegroup "ng-2e67ae8c" has 2 node(s)
-2022-07-10 20:26:56 [ℹ]  node "ip-192-168-25-85.cn-northwest-1.compute.internal" is ready
-2022-07-10 20:26:56 [ℹ]  node "ip-192-168-51-110.cn-northwest-1.compute.internal" is ready
-2022-07-10 20:26:56 [ℹ]  waiting for at least 2 node(s) to become ready in "ng-2e67ae8c"
-2022-07-10 20:26:56 [ℹ]  nodegroup "ng-2e67ae8c" has 2 node(s)
-2022-07-10 20:26:56 [ℹ]  node "ip-192-168-25-85.cn-northwest-1.compute.internal" is ready
-2022-07-10 20:26:56 [ℹ]  node "ip-192-168-51-110.cn-northwest-1.compute.internal" is ready
-2022-07-10 20:26:57 [ℹ]  kubectl command should work with "/Users/zeno/.kube/config", try 'kubectl get nodes'
-2022-07-10 20:26:57 [✔]  EKS cluster "eksworkshop" in "cn-northwest-1" region is ready
+2023-08-09 10:43:06 [ℹ]  building cluster stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:43:06 [ℹ]  deploying stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:43:36 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:44:07 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:45:07 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:46:07 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:47:08 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:48:08 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:49:08 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:50:08 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:51:09 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-cluster"
+2023-08-09 10:53:12 [ℹ]  building managed nodegroup stack "eksctl-eksworkshop-nodegroup-ng-fc4b07eb"
+2023-08-09 10:53:13 [ℹ]  deploying stack "eksctl-eksworkshop-nodegroup-ng-fc4b07eb"
+2023-08-09 10:53:13 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-fc4b07eb"
+2023-08-09 10:53:43 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-fc4b07eb"
+2023-08-09 10:54:43 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-fc4b07eb"
+2023-08-09 10:56:40 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-nodegroup-ng-fc4b07eb"
+2023-08-09 10:56:40 [ℹ]  waiting for the control plane to become ready
+2023-08-09 10:56:41 [✔]  saved kubeconfig as "/Users/zeno/.kube/config"
+2023-08-09 10:56:41 [ℹ]  no tasks
+2023-08-09 10:56:41 [✔]  all EKS cluster resources for "eksworkshop" have been created
+2023-08-09 10:56:41 [ℹ]  nodegroup "ng-fc4b07eb" has 2 node(s)
+2023-08-09 10:56:41 [ℹ]  node "ip-192-168-11-87.cn-northwest-1.compute.internal" is ready
+2023-08-09 10:56:41 [ℹ]  node "ip-192-168-55-95.cn-northwest-1.compute.internal" is ready
+2023-08-09 10:56:41 [ℹ]  waiting for at least 2 node(s) to become ready in "ng-fc4b07eb"
+2023-08-09 10:56:41 [ℹ]  nodegroup "ng-fc4b07eb" has 2 node(s)
+2023-08-09 10:56:41 [ℹ]  node "ip-192-168-11-87.cn-northwest-1.compute.internal" is ready
+2023-08-09 10:56:41 [ℹ]  node "ip-192-168-55-95.cn-northwest-1.compute.internal" is ready
+2023-08-09 10:56:42 [ℹ]  kubectl command should work with "/Users/zeno/.kube/config", try 'kubectl get nodes'
+2023-08-09 10:56:42 [✔]  EKS cluster "eksworkshop" in "cn-northwest-1" region is ready
 ```
 
 集群创建完成后, 查看EKS集群节点
@@ -83,9 +91,10 @@ kubectl get node
 参考输出
 
 ```
-NAME                                                STATUS   ROLES    AGE   VERSION
-ip-192-168-25-85.cn-northwest-1.compute.internal    Ready    <none>   87m   v1.22.9-eks-810597c
-ip-192-168-51-110.cn-northwest-1.compute.internal   Ready    <none>   87m   v1.22.9-eks-810597c
+$ kubectl get node
+NAME                                               STATUS   ROLES    AGE   VERSION
+ip-192-168-11-87.cn-northwest-1.compute.internal   Ready    <none>   46m   v1.27.3-eks-a5565ad
+ip-192-168-55-95.cn-northwest-1.compute.internal   Ready    <none>   46m   v1.27.3-eks-a5565ad
 ```
 
 ## 2. 部署一个Nginx测试EKS集群基本功能
@@ -157,12 +166,6 @@ deployment.apps/nginx-deployment created
 service/service-nginx created
 
 $ kubectl get pods
-NAME                                READY   STATUS              RESTARTS   AGE
-nginx-deployment-7848d4b86f-xlkg4   0/1     ContainerCreating   0          14s
-(base) ~/Downloads$ kubectl get pods
-NAME                                READY   STATUS              RESTARTS   AGE
-nginx-deployment-7848d4b86f-xlkg4   0/1     ContainerCreating   0          15s
-(base) ~/Downloads$ kubectl get pods
 NAME                                READY   STATUS    RESTARTS   AGE
 nginx-deployment-7848d4b86f-xlkg4   1/1     Running   0          17s
 
@@ -172,28 +175,10 @@ nginx-deployment   1/1     1            1           30s
 
 $ kubectl get service service-nginx -o wide
 NAME            TYPE           CLUSTER-IP      EXTERNAL-IP                                                                             PORT(S)        AGE   SELECTOR
-service-nginx   LoadBalancer   10.100.243.82   a4705ea1dbea943e6863ff87a396b7cb-89a0f084e135db56.elb.cn-northwest-1.amazonaws.com.cn   80:30104/TCP   35s   app=nginx
+service-nginx   LoadBalancer   10.100.243.82   xxxxxxxxxxxxxxxxxxxxxxxxxxx.elb.cn-northwest-1.amazonaws.com.cn   80:30104/TCP   35s   app=nginx
 $ ELB=$(kubectl get service service-nginx -o json | jq -r '.status.loadBalancer.ingress[].hostname')
 
 $ curl -m3 -v $ELB
-*   Trying 52.83.120.194:80...
-* Connected to 52.83.120.194 (52.83.120.194) port 80 (#0)
-> GET / HTTP/1.1
-> Host: 52.83.120.194
-> User-Agent: curl/7.82.0
-> Accept: */*
->
-* Mark bundle as not supporting multiuse
-< HTTP/1.1 200 OK
-< Server: nginx/1.23.0
-< Date: Sun, 10 Jul 2022 14:02:42 GMT
-< Content-Type: text/html
-< Content-Length: 615
-< Last-Modified: Tue, 21 Jun 2022 14:25:37 GMT
-< Connection: keep-alive
-< ETag: "62b1d4e1-267"
-< Accept-Ranges: bytes
-<
 <!DOCTYPE html>
 <html>
 <head>
@@ -217,7 +202,6 @@ Commercial support is available at
 <p><em>Thank you for using nginx.</em></p>
 </body>
 </html>
-* Connection #0 to host 52.83.120.194 left intact
 ```
 
 ### 2.3 清理环境
@@ -246,9 +230,9 @@ eksctl scale nodegroup --cluster=${CLUSTER_NAME} --nodes=3 --name=${NODE_GROUP} 
 
 ```
 $ eksctl scale nodegroup --cluster=${CLUSTER_NAME} --nodes=3 --name=${NODE_GROUP} --nodes-max=3 --region=${AWS_REGION}
-2022-07-10 22:07:41 [ℹ]  scaling nodegroup "ng-2e67ae8c" in cluster eksworkshop
-2022-07-10 22:07:42 [ℹ]  waiting for scaling of nodegroup "ng-2e67ae8c" to complete
-2022-07-10 22:08:13 [ℹ]  nodegroup successfully scaled
+2023-08-09 11:51:42 [ℹ]  scaling nodegroup "ng-fc4b07eb" in cluster eksworkshop
+2023-08-09 11:51:43 [ℹ]  initiated scaling of nodegroup
+2023-08-09 11:51:43 [ℹ]  to see the status of the scaling run `eksctl get nodegroup --cluster eksworkshop --region cn-northwest-1 --name ng-fc4b07eb`
 ```
 
 检查结果
@@ -264,13 +248,13 @@ kubectl get node
 ```
 $ eksctl get nodegroup --cluster ${CLUSTER_NAME} --region=${AWS_REGION}
 CLUSTER		NODEGROUP	STATUS	CREATED			MIN SIZE	MAX SIZE	DESIRED CAPACITY	INSTANCE TYPE	IMAGE ID	ASG NAME						TYPE
-eksworkshop	ng-2e67ae8c	ACTIVE	2022-07-10T12:23:57Z	2		3		3			t3.medium	AL2_x86_64	eks-ng-2e67ae8c-6ec0f408-7d9a-e4fd-8fa5-4773be1dfb4b	managed
+eksworkshop	ng-fc4b07eb	ACTIVE	2023-08-09T02:53:32Z	2		3		3			t3.medium	AL2_x86_64	eks-ng-fc4b07eb-48c4ec1b-57c1-1ce1-884a-8f8969d63e8c	managed
 
 $ kubectl get node
-NAME                                                STATUS     ROLES    AGE    VERSION
-ip-192-168-25-85.cn-northwest-1.compute.internal    Ready      <none>   103m   v1.22.9-eks-810597c
-ip-192-168-51-110.cn-northwest-1.compute.internal   Ready      <none>   103m   v1.22.9-eks-810597c
-ip-192-168-66-163.cn-northwest-1.compute.internal   NotReady   <none>   4s     v1.22.9-eks-810597c
+NAME                                               STATUS   ROLES    AGE   VERSION
+ip-192-168-11-87.cn-northwest-1.compute.internal   Ready    <none>   57m   v1.27.3-eks-a5565ad
+ip-192-168-55-95.cn-northwest-1.compute.internal   Ready    <none>   57m   v1.27.3-eks-a5565ad
+ip-192-168-68-18.cn-northwest-1.compute.internal   Ready    <none>   13s   v1.27.3-eks-a5565ad
 ```
 
 ## 4. 镜像处置(针对中国区)
