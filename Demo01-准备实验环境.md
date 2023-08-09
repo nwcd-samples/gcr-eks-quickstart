@@ -23,7 +23,7 @@ pip install awscli
 
 ```
 $ aws --version
-aws-cli/2.7.14 Python/3.10.5 Darwin/21.5.0 source/arm64 prompt/off
+aws-cli/2.13.7 Python/3.11.4 Darwin/22.5.0 source/arm64 prompt/off
 ```
 
 ### 1.2 Windows系统
@@ -35,7 +35,7 @@ Windows 系统下可以根据系统情况, 通过下载[64位](https://s3.amazon
 
 ```
 >aws --version
-aws-cli/2.1.15 Python/3.7.9 Windows/10 exe/AMD64 prompt/off
+aws-cli/2.13.7 Python/3.11.4 Windows/10 exe/AMD64 prompt/off
 ```
 
 ### 1.3 配置AWS CLI 权限
