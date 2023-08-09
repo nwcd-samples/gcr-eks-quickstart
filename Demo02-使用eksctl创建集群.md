@@ -1,6 +1,8 @@
 # Demo02-使用eksctl创建集群
 --
 #### Contributor: Zhengyu Ren
+#### 更新时间: 2023-08-09
+#### 基于EKS版本: EKS 1.27
 --
 ## 1. 使用eksctl创建EKS集群
 该操作需要10~15分钟, 该操作将会创建一个使用t3. medium的纳管节点组.
