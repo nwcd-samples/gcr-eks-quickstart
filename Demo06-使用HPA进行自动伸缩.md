@@ -1,6 +1,8 @@
 # Demo06-使用HPA进行自动伸缩
 --
-#### Contributor: Kunyao Han
+#### Contributor: Tao Dai
+#### 更新时间: 2023-09-19
+#### 基于EKS版本: EKS 1.27
 --
 
 Metrics Server是Kubernetes内置自动缩放pipelines的可扩展、高效的容器资源指标来源,这些指标将推动部署的扩展行为,我们将使用 Kubernetes Metrics Server部署指标服务器。
@@ -12,7 +14,7 @@ Metrics Server是Kubernetes内置自动缩放pipelines的可扩展、高效的�
 a. 下载metrics-server安装文件到本地：
 
 ```
-wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.4/components.yaml
 ```
 
 b. 使用Kubernetes mutating admission webhook自动更换Kubernetes Pod的容器镜像
@@ -27,8 +29,9 @@ https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutat
 ```
 将yaml文件的内容复制保存到本地，生成mutating-webhook.yaml；
 
-c. 安装metrics-server
-
+c. 将Image更新为Public ECR中1.27支持的最新版本：
+<br>public.ecr.aws/eks-distro/kubernetes-sigs/metrics-server:v0.6.4-eks-1-27-latest
+<br>并安装metrics-server
 ```
 kubectl apply -f components.yaml
 ```
@@ -49,6 +52,9 @@ apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
 ### 1.2 验证metrics-server APIService 的状态（可能需要等几分钟）
 
 ```
+sudo yum install epel-release -y
+sudo yum install jq -y
+
 kubectl get apiservice v1beta1.metrics.k8s.io -o json | jq '.status'
 ```
 输出显示：
@@ -57,7 +63,7 @@ kubectl get apiservice v1beta1.metrics.k8s.io -o json | jq '.status'
 {
   "conditions": [
     {
-      "lastTransitionTime": "2022-07-07T05:33:41Z",
+      "lastTransitionTime": "2023-09-19T12:46:19Z",
       "message": "all checks passed",
       "reason": "Passed",
       "status": "True",
@@ -158,19 +164,14 @@ kubectl get hpa -w
 输出显示：
 
 ```
-NAME         REFERENCE               TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
-php-apache   Deployment/php-apache   80%/50%   1         10        10         5m38s
-php-apache   Deployment/php-apache   64%/50%   1         10        10         5m46s
-php-apache   Deployment/php-apache   45%/50%   1         10        10         6m1s
-php-apache   Deployment/php-apache   45%/50%   1         10        10         6m16s
-php-apache   Deployment/php-apache   50%/50%   1         10        10         6m31s
-php-apache   Deployment/php-apache   49%/50%   1         10        10         6m46s
-php-apache   Deployment/php-apache   48%/50%   1         10        10         7m1s
-php-apache   Deployment/php-apache   45%/50%   1         10        10         7m16s
-php-apache   Deployment/php-apache   50%/50%   1         10        10         7m31s
-php-apache   Deployment/php-apache   46%/50%   1         10        10         7m46s
-php-apache   Deployment/php-apache   48%/50%   1         10        10         8m1s
-php-apache   Deployment/php-apache   45%/50%   1         10        10         8m16s
+kubectl get hpa -w
+NAME         REFERENCE               TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+php-apache   Deployment/php-apache   <unknown>/50%   1         10        1          2m2s
+php-apache   Deployment/php-apache   481%/50%        1         10        1          2m30s
+php-apache   Deployment/php-apache   467%/50%        1         10        4          2m45s
+php-apache   Deployment/php-apache   163%/50%        1         10        8          3m
+php-apache   Deployment/php-apache   59%/50%         1         10        10         3m15s
+php-apache   Deployment/php-apache   47%/50%         1         10        10         3m30s
 ```
 
 查看pod的情况
