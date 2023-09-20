@@ -1,14 +1,14 @@
 # Demo06-使用EBS CSI部署有状态应用
 --
 #### Contributor: Tao Dai
---
-### 更新20221204：建议使用EKS Add-ons安装
+#### 更新时间: 2023-09-19
+#### 基于EKS版本: EKS 1.27
 
 ### 先决条件
 为集群创建IAM OIDC提供商
 
 ```
-eksctl utils associate-iam-oidc-provider --cluster prod --approve
+eksctl utils associate-iam-oidc-provider --cluster test --approve
 ```
 ### 1.配置EBS CSI所需IAM权限
 
@@ -41,7 +41,7 @@ POLICY_ARN=$(aws iam create-policy \
 a.使用eksctl创建IAM Service Account
 
 ```
-CLUSTER_NAME=prod
+CLUSTER_NAME=test
 
 eksctl create iamserviceaccount \
     --name ebs-csi-controller-sa \
@@ -59,33 +59,29 @@ ROLE_ARN=$(aws cloudformation describe-stacks \
     --query='Stacks[].Outputs[?OutputKey==`Role1`].OutputValue' \
     --output text)
 ```
-### 2.部署EBS CSI驱动程序
+### 2.部署EBS CSI Driver插件
 
 2.1 中国区使用国内容器镜像站
 
 ```
 kubectl apply -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
 ```
-2.2 部署EBS CSI驱动程序
-
-a.部署EBS CSI
-
-```
-kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.6"
-```
-b.对service account添加注解
+2.2 使用eksctl部署EBS CSI Driver插件
+<br>test替换成当前EKS集群名称，1234567890替换成当前AWS中国区域账号ID
 
 ```
-kubectl annotate serviceaccount ebs-csi-controller-sa \
-    -n kube-system eks.amazonaws.com.cn/role-arn=$ROLE_ARN
+eksctl create addon \
+	--name aws-ebs-csi-driver \
+	--cluster test \
+	--service-account-role-arn arn:aws-cn:iam::1234567890:role/AmazonEKS_EBS_CSI_DriverRole \
+	--force
 ```
-
-c.删除驱动程序Pod，以使其按照新的IAM Role重新部署
+2.3 查看EBS CSI Driver插件
 
 ```
-kubectl delete pods \
-    -n kube-system \
-    -l=app=ebs-csi-controller
+eksctl get addon --name aws-ebs-csi-driver --cluster test
+NAME                    VERSION                 STATUS  ISSUES  IAMROLE                                                         UPDATE AVAILABLE        CONFIGURATION VALUES
+aws-ebs-csi-driver      v1.22.0-eksbuild.2      ACTIVE  0       arn:aws-cn:iam::1234567890:role/AmazonEKS_EBS_CSI_DriverRole
 ```
 
 ### 3.部署示例应用程序进行验证
@@ -144,8 +140,8 @@ Wed Jul 6 07:17:51 UTC 2022
 # 删除示例应用程序
 kubectl delete -f manifests/
 
-# 删除EBS CSI驱动程序
-kubectl delete -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.6"
+# 删除EBS CSI Driver插件
+eksctl delete addon --cluster test --name aws-ebs-csi-driver --preserve
 
 # 删除IAM Serive Account
 eksctl delete iamserviceaccount \
@@ -155,5 +151,3 @@ eksctl delete iamserviceaccount \
 # 删除IAM Policy
 aws iam delete-policy --policy-arn $POLICY_ARN
 ```
-
-
