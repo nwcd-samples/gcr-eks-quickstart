@@ -1,4 +1,4 @@
-# Demo06-使用EBS CSI部署有状态应用
+# Demo07-使用EBS CSI部署有状态应用
 --
 #### Contributor: Tao Dai
 #### 更新时间: 2023-09-19
