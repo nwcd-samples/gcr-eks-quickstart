@@ -106,8 +106,8 @@ CLUSTER_NAME='eksworkshop'
 
 eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
 
-2023-08-09 13:59:49 [ℹ]  will create IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
-2023-08-09 13:59:50 [✔]  created IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
+#2023-08-09 13:59:49 [ℹ]  will create IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
+#2023-08-09 13:59:50 [✔]  created IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
 ```
 
 #### 2.1.2 创建所需要的IAM policy
@@ -130,21 +130,21 @@ eksctl create iamserviceaccount \
   --cluster=${CLUSTER_NAME} \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
+  --role-name AmazonEKSLoadBalancerControllerRole \
   --attach-policy-arn=${POLICY_NAME} \
-  --override-existing-serviceaccounts \
   --approve
 
-2023-08-09 14:01:03 [ℹ]  1 iamserviceaccount (kube-system/aws-load-balancer-controller) was included (based on the include/exclude rules)
-2023-08-09 14:01:03 [!]  metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set
-2023-08-09 14:01:03 [ℹ]  1 task: {
-    2 sequential sub-tasks: {
-        create IAM role for serviceaccount "kube-system/aws-load-balancer-controller",
-        create serviceaccount "kube-system/aws-load-balancer-controller",
-    } }2023-08-09 14:01:03 [ℹ]  building iamserviceaccount stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
-2023-08-09 14:01:03 [ℹ]  deploying stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
-2023-08-09 14:01:03 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
-2023-08-09 14:01:34 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
-2023-08-09 14:01:34 [ℹ]  created serviceaccount "kube-system/aws-load-balancer-controller"
+#2023-08-09 14:01:03 [ℹ]  1 iamserviceaccount (kube-system/aws-load-balancer-controller) was included (based on the include/exclude rules)
+#2023-08-09 14:01:03 [!]  metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set
+#2023-08-09 14:01:03 [ℹ]  1 task: {
+#    2 sequential sub-tasks: {
+#        create IAM role for serviceaccount "kube-system/aws-load-balancer-controller",
+#        create serviceaccount "kube-system/aws-load-balancer-controller",
+#    } }2023-08-09 14:01:03 [ℹ]  building iamserviceaccount stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+#2023-08-09 14:01:03 [ℹ]  deploying stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+#2023-08-09 14:01:03 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+#2023-08-09 14:01:34 [ℹ]  waiting for CloudFormation stack "eksctl-eksworkshop-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+#2023-08-09 14:01:34 [ℹ]  created serviceaccount "kube-system/aws-load-balancer-controller"
 ```
 
 ### 2.2 部署Amazon Load Balancer Controller
@@ -162,18 +162,18 @@ helm repo add eks https://aws.github.io/eks-charts
 ```
 helm repo update
 
-Hang tight while we grab the latest from your chart repositories...
-...Successfully got an update from the "koderover-chart" chart repository
-...Successfully got an update from the "chaosblade-io" chart repository
-...Successfully got an update from the "coroot" chart repository
-...Successfully got an update from the "eks" chart repository
-...Successfully got an update from the "litmuschaos" chart repository
-...Successfully got an update from the "kubecost" chart repository
-...Successfully got an update from the "ilum" chart repository
-...Successfully got an update from the "karpenter" chart repository
-...Successfully got an update from the "chaos-mesh" chart repository
-...Successfully got an update from the "prometheus-community" chart repository
-Update Complete. ⎈Happy Helming!⎈
+#Hang tight while we grab the latest from your chart repositories...
+#...Successfully got an update from the "koderover-chart" chart repository
+#...Successfully got an update from the "chaosblade-io" chart repository
+#...Successfully got an update from the "coroot" chart repository
+#...Successfully got an update from the "eks" chart repository
+#...Successfully got an update from the "litmuschaos" chart repository
+#...Successfully got an update from the "kubecost" chart repository
+#...Successfully got an update from the "ilum" chart repository
+#...Successfully got an update from the "karpenter" chart repository
+#...Successfully got an update from the "chaos-mesh" chart repository
+#...Successfully got an update from the "prometheus-community" chart repository
+#Update Complete. ⎈Happy Helming!⎈
 ```
 
 3.利用Helm进行部署
@@ -182,10 +182,10 @@ Helm安装参考文档: [https://docs.amazonaws.cn/eks/latest/userguide/helm.htm
 
 ```
 #北京区Controller Image地址
-**918309763551.dkr.ecr.cn-north-1.amazonaws.com.cn/amazon/aws-load-balancer-controller**
+#**918309763551.dkr.ecr.cn-north-1.amazonaws.com.cn/amazon/aws-load-balancer-controller**
 
 #宁夏区Controller Image地址
-**961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/amazon/aws-load-balancer-controller**
+#**961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/amazon/aws-load-balancer-controller**
 
 AWS_REGION='cn-northwest-1'
 CLUSTER_NAME='eksworkshop'
@@ -197,10 +197,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set enableShield=false \
   --set enableWaf=false \
-  --set enableWafv2=false \
-  --set region=${AWS_REGION} \
-  --set vpcId=<Your-VPC-ID> \
-  --set image.repository=961992271922.dkr.ecr.cn-northwest-1.amazonaws.com.cn/amazon/aws-load-balancer-controller
+  --set enableWafv2=false
 
 #NAME: aws-load-balancer-controller
 #LAST DEPLOYED: Wed Aug  9 14:04:41 2023
