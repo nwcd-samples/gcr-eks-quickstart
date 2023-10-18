@@ -13,6 +13,10 @@
 使用eksctl 创建service account  
 
 ```
+AWS_REGION=cn-northwest-1
+AWS_DEFAULT_REGION=cn-northwest-1
+CLUSTER_NAME=eksworkshop
+
 # 执行以下命令创建OpenID Connect (OIDC) 身份提供商
 eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
 
