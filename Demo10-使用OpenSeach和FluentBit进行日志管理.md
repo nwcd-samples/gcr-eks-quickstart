@@ -90,6 +90,19 @@ sed -i 's@arn:aws:es:::domain/eksworkshop-logging/@@' ~/environment/logging/es_d
 # 创建集群，请等待创建完成
 aws opensearch create-domain \
   --cli-input-json  file://~/environment/logging/es_domain.json
+
+while true
+do
+   ES_ENDPOINT=$(aws opensearch describe-domain --domain-name ${ES_DOMAIN_NAME} --region ${AWS_REGION} --output text --query "DomainStatus.Endpoint")
+   if [ $ES_ENDPOINT == "None" ]; then
+      echo "Still provisioning"
+      sleep 10;
+      continue
+   else
+      echo "Provisioning finished"
+      break
+   fi
+done
 ```
 
 ## 5. 将IAM Role映射到用户
