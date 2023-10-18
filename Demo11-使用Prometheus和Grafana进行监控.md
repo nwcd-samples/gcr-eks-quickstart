@@ -15,7 +15,7 @@
 
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm pull prometheus-community/prometheus --version 15.10.4
+helm pull prometheus-community/prometheus --version 15.10.4 # 如果下载失败，多试几次
 tar -xzvf prometheus-15.10.4.tgz
 ```
 
