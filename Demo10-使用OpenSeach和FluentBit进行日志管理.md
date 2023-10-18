@@ -148,6 +148,43 @@ cd ~/environment/logging/
 wget https://archive.eksworkshop.com/intermediate/230_logging/deploy.files/fluentbit.yaml
 envsubst < ~/environment/logging/fluentbit.yaml > ~/environment/logging/fluentbit_new.yaml
 
+# 删除fluentbit_new.yaml文件中的两段内容
+[INPUT]
+    Name              tail
+    Tag               kube.*
+    Path              /var/log/containers/*.log
+    Parser            docker
+    DB                /var/log/flb_kube.db
+    Mem_Buf_Limit     50MB
+    Skip_Long_Lines   On
+    Refresh_Interval  10
+
+[PARSER]
+    Name        docker
+    Format      json
+    Time_Key    time
+    Time_Format %Y-%m-%dT%H:%M:%S.%L
+    Time_Keep   On
+
+# 在fluentbit_new.yaml文件中添加两段内容
+[INPUT]
+    Name              tail
+    Tag               kube.*
+    Path              /var/log/containers/*.log
+    Parser            cri
+    DB                /var/log/flb_kube.db
+    Mem_Buf_Limit     50MB
+    Skip_Long_Lines   On
+    Refresh_Interval  10
+
+[PARSER]
+    Name        cri
+    Format      regex
+    Regex ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<message>.*)$
+    Time_Key    time
+    Time_Format %Y-%m-%dT%H:%M:%S.%L
+    Time_Keep   On
+
 # 部署fluentbit pod    
 kubectl apply -f ~/environment/logging/fluentbit.yaml
 kubectl --namespace=logging get pods
