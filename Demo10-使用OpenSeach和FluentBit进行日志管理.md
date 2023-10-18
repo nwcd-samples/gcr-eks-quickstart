@@ -169,25 +169,25 @@ OpenSearch Dashboards user: ${ES_DOMAIN_USER}
 OpenSearch Dashboards password: ${ES_DOMAIN_PASSWORD}"
 ```
 7.1 登录OpenSearch Dashboards
-![](https://www.eksworkshop.com/images/logging/opensearch_01.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_01.png)
 7.2 选择Explore on my own
-![](https://www.eksworkshop.com/images/logging/opensearch_02.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_02.png)
 7.3 选择Confirm
-![](https://www.eksworkshop.com/images/logging/opensearch_03.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_03.png)
 7.4 选择OpenSearch Dashboards
-![](https://www.eksworkshop.com/images/logging/opensearch_04.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_04.png)
 7.5 选择Add your data
-![](https://www.eksworkshop.com/images/logging/opensearch_05.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_05.png)
 7.6 选择Create index pattern
-![](https://www.eksworkshop.com/images/logging/opensearch_06.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_06.png)
 7.7 选择Create index pattern
-![](https://www.eksworkshop.com/images/logging/opensearch_06.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_06.png)
 7.8 写入*fluent-bit*
-![](https://www.eksworkshop.com/images/logging/opensearch_07.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_07.png)
 7.9 选择@timestamp
-![](https://www.eksworkshop.com/images/logging/opensearch_08.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_08.png)
 7.10 选择Discover查看数据
-![](https://www.eksworkshop.com/images/logging/opensearch_09.png)
+![](https://archive.eksworkshop.com/images/logging/opensearch_09.png)
 
 ## 8. 清理环境
 ```
