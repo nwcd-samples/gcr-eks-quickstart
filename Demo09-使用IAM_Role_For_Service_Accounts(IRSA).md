@@ -49,7 +49,7 @@ spec:
         command:
         - "sh"
         - "-c"
-        - "yum install unzip -y && curl 'https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip' -o 'awscliv2.zip' && unzip awscliv2.zip && ./aws/install && aws s3 ls"
+        - "yum install pip -y && pip install awscli && aws s3 ls"
       restartPolicy: Never
 EoF
 
