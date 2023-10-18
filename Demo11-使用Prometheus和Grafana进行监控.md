@@ -9,6 +9,12 @@
 1.1 准备实验环境：参考Demo 01  
 1.2 使用eksctl创建集群：参考Demo 02，不要执行 4. 镜像处置(针对中国区)  
 1.3 已经安装helm  
+1.4 设置环境变量
+```
+AWS_REGION=cn-northwest-1
+AWS_DEFAULT_REGION=cn-northwest-1
+CLUSTER_NAME=eksworkshop
+```
 
 ## 2. 部署Prometheus
 ### 2.1 下载指定版本helm chart
