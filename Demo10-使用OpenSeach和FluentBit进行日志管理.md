@@ -94,8 +94,11 @@ aws opensearch create-domain \
 
 ## 5. 将IAM Role映射到用户
 ```
+# 安装jq
+sudo yum install jq -y
+
 # 获取Fluent Bit Role ARN
-export FLUENTBIT_ROLE=$(eksctl get iamserviceaccount --cluster eksworkshop --namespace logging -o json | jq '.[].status.roleARN' -r)
+export FLUENTBIT_ROLE=$(eksctl get iamserviceaccount --cluster eksworkshop --namespace logging --region ${AWS_REGION} -o json | jq '.[].status.roleARN' -r)
 
 # 获取Amazon OpenSearch Endpoint
 export ES_ENDPOINT=$(aws opensearch describe-domain --domain-name ${ES_DOMAIN_NAME} --output text --query "DomainStatus.Endpoint")
