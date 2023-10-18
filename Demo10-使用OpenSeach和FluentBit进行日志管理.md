@@ -142,9 +142,11 @@ cd ~/environment/logging
 
 # 获取Amazon OpenSearch Endpoint
 export ES_ENDPOINT=$(aws es describe-elasticsearch-domain --domain-name ${ES_DOMAIN_NAME} --output text --query "DomainStatus.Endpoint")
+export AWS_REGION=cn-northwest-1
 
-curl -Ss https://archive.eksworkshop.com/intermediate/230_logging/deploy.files/fluentbit.yaml \
-    | envsubst > ~/environment/logging/fluentbit.yaml
+cd ~/environment/logging/
+wget https://archive.eksworkshop.com/intermediate/230_logging/deploy.files/fluentbit.yaml
+envsubst < ~/environment/logging/fluentbit.yaml > ~/environment/logging/fluentbit_new.yaml
 
 # 部署fluentbit pod    
 kubectl apply -f ~/environment/logging/fluentbit.yaml
