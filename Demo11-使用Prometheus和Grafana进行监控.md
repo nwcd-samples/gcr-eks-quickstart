@@ -136,6 +136,9 @@ tar -xvzf grafana-6.32.2.tgz
 ```
 kubectl create namespace grafana
 
+# 禁用podsecuritypolicy
+sed 's/pspEnabled: true/pspEnabled: false/g' values.yaml | egrep pspEnabled
+
 helm install grafana ./grafana \
     --namespace grafana \
     --set persistence.storageClassName="ebs-sc" \
