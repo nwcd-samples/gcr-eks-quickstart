@@ -22,9 +22,7 @@ ACCOUNT_ID=<>
 ## 2. 配置Fluent Bit使用的IRSA
 ```
 # 执行以下命令创建OpenID Connect (OIDC) 身份提供商
-eksctl utils associate-iam-oidc-provider \
-    --cluster eksworkshop \
-    --approve
+eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
     
 # 执行以下命令新建IAM Policy
 mkdir -p ~/environment/logging/
