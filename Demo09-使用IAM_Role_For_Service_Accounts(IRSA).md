@@ -7,7 +7,7 @@
 
 ## 1. 先决条件  
 1.1 准备实验环境：参考Demo 01  
-1.2 使用eksctl创建集群：参考Demo 02，不要执行4. 镜像处置(针对中国区)
+1.2 使用eksctl创建集群：参考Demo 02，不要执行 4. 镜像处置(针对中国区)
 
 ## 2. 配置IAM Role, ServiceAccount
 使用eksctl 创建service account  
