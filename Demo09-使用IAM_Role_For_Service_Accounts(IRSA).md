@@ -45,7 +45,7 @@ spec:
       serviceAccountName: s3-echoer
       containers:
       - name: list-bucket
-        image: amazonlinux:2018.03
+        image: public.ecr.aws/docker/library/amazonlinux:2
         command:
         - "sh"
         - "-c"
