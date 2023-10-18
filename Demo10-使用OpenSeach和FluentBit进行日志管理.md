@@ -81,7 +81,7 @@ export ES_DOMAIN_USER="eksworkshop"
 export ES_DOMAIN_PASSWORD="ezQZsym3UUQSlj8F_Ek1$"
 
 # 下载并更新文件
-curl -sS https://www.eksworkshop.com/intermediate/230_logging/deploy.files/es_domain.json \
+curl -sS https://archive.eksworkshop.com/intermediate/230_logging/deploy.files/es_domain.json \
   | envsubst > ~/environment/logging/es_domain.json
 sed -i '18,20d' ~/environment/logging/es_domain.json
 sed -i 's/ESHttp//' ~/environment/logging/es_domain.json
