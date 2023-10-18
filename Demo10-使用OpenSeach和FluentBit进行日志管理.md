@@ -52,6 +52,7 @@ aws iam create-policy   \
 kubectl create namespace logging
 
 eksctl create iamserviceaccount \
+    --region ${AWS_REGION} \
     --name fluent-bit \
     --namespace logging \
     --cluster eksworkshop \
