@@ -12,9 +12,10 @@
   
 ```
 AWS_REGION=cn-northwest-1
+AWS_DEFAULT_REGION=cn-northwest-1
+CLUSTER_NAME=eksworkshop
+
 AWS_Region=cn-northwest-1
-AWS_DEFAULT_REGION=cn-northwest-1  
-CLUSTER_NAME=eksworkshop  
 ACCOUNT_ID=<>
 ```
 
