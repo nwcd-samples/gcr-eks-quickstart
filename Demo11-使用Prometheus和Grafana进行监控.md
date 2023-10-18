@@ -65,6 +65,7 @@ EoF
 
 kubectl create -f ~/storageclass.yaml
 
+# 安装prometheus
 cd ~
 kubectl create namespace prometheus
 helm install prometheus ./prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
