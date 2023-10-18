@@ -14,7 +14,6 @@
 ### 2.1 下载指定版本helm chart
 
 ```
-# 添加repo需要一定时间，请耐心等待
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm pull prometheus-community/prometheus --version 15.10.4
 tar -xzvf prometheus-15.10.4.tgz
