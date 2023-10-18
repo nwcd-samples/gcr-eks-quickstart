@@ -65,10 +65,10 @@ EoF
 
 kubectl create -f ~/storageclass.yaml
 
-# 安装prometheus
+# 安装Prometheus
 cd ~
 kubectl create namespace prometheus
-helm install prometheus ./prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
+helm install prometheus ./prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="ebs-sc" --set server.persistentVolume.storageClass="ebs-sc"
 
 # 留意Prometheus endpoint，后续步骤会使用到  
 The Prometheus server can be accessed via port 80 on the following DNS name from within your cluster:
