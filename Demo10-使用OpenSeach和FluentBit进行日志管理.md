@@ -101,7 +101,7 @@ sudo yum install jq -y
 export FLUENTBIT_ROLE=$(eksctl get iamserviceaccount --cluster eksworkshop --namespace logging --region ${AWS_REGION} -o json | jq '.[].status.roleARN' -r)
 
 # 获取Amazon OpenSearch Endpoint
-export ES_ENDPOINT=$(aws opensearch describe-domain --domain-name ${ES_DOMAIN_NAME} --output text --query "DomainStatus.Endpoint")
+export ES_ENDPOINT=$(aws opensearch describe-domain --domain-name ${ES_DOMAIN_NAME} --region ${AWS_REGION} --output text --query "DomainStatus.Endpoint")
 
 # 更新Elasticsearch内部数据库
 curl -sS -u "${ES_DOMAIN_USER}:${ES_DOMAIN_PASSWORD}" \
