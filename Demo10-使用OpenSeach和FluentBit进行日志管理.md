@@ -1,6 +1,8 @@
 # Demo10-使用OpenSeach和Fluent bit进行日志管理
 --
 #### Contributor: Yi Zheng
+#### 更新时间: 2023-10-18
+#### 基于EKS版本: EKS 1.27
 --
 
 ## 1. 先决条件  
