@@ -14,6 +14,7 @@
 AWS_REGION=cn-northwest-1
 AWS_DEFAULT_REGION=cn-northwest-1
 CLUSTER_NAME=eksworkshop
+ACCOUNT_ID=<>
 ```
 
 ## 2. 部署Prometheus
@@ -36,6 +37,34 @@ sed -i 's@v2.5.0@2.5.0@' values.yaml
 ### 2.3 安装prometheus chart
 
 ```
+# 使用eksctl 创建service account
+eksctl create iamserviceaccount \
+    --name ebs-csi-controller-sa \
+    --namespace kube-system \
+    --cluster ${CLUSTER_NAME} \
+    --role-name AmazonEKS_EBS_CSI_DriverRole \
+    --role-only \
+    --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+    --approve  \
+    --region ${AWS_REGION}
+
+# 添加Amazon EBS CSI driver add-on
+eksctl create addon --name aws-ebs-csi-driver --cluster ${CLUSTER_NAME} --service-account-role-arn arn:aws-cn:iam::${ACCOUNT_ID}:role/AmazonEKS_EBS_CSI_DriverRole --region ${AWS_REGION} --force
+
+# 创建storage class
+cat <<EoF > ~/storageclass.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-sc
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  type: gp3
+EoF
+
+kubectl create -f ~/storageclass.yaml
+
 cd ~
 kubectl create namespace prometheus
 helm install prometheus ./prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
