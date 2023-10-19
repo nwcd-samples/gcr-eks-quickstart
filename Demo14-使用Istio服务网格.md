@@ -61,7 +61,7 @@ kubectl -n istio-system get pods
 kubectl label namespace default istio-injection=enabled
 
 # 部署 bookinfo 示例应用
-cd ~/istio/istio-1.12.9/
+cd ~/istio/istio-1.19.3/
 kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
 
 # 等待所有 pod 正常运行
