@@ -60,9 +60,6 @@ kubectl -n istio-system get pods
 # 启用 Istio sidecar 自动注入
 kubectl label namespace default istio-injection=enabled
 
-# 删除 image mirror webhook 并重新部署，以便自动映射 sidecar image 为中国区镜像
-kubectl apply -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
-
 # 部署 bookinfo 示例应用
 cd ~/istio/istio-1.12.9/
 kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
