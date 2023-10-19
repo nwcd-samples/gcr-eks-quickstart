@@ -45,9 +45,6 @@ istioctl version --remote=false
 ### 4.2 部署 istio
 
 ```
-# 删除webhook
-kubectl delete -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
-
 # 部署 istio
 # 使用 --set profile=demo 部署所有模块
 istioctl manifest apply --set profile=demo
