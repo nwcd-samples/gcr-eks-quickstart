@@ -1,6 +1,8 @@
 # Demo14-使用Istio服务网格
 --
 #### Contirbutor: Yi Zheng
+#### 更新时间: 2023-10-19
+#### 基于EKS版本: EKS 1.27
 --
 
 ## 1. 先决条件  
