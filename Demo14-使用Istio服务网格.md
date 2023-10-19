@@ -163,7 +163,6 @@ kubectl delete -f samples/bookinfo/networking/destination-rule-all.yaml
 删除 nlb
 kubectl delete -f samples/bookinfo/networking/bookinfo-gateway.yaml
 kubectl delete -f samples/bookinfo/platform/kube/bookinfo.yaml
-kubectl delete -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
 
 # 使用 istioctl 删除所有 rbac 权限、istio-system namespace 及相关资源
 istioctl manifest generate --set profile=demo | kubectl delete -f -
