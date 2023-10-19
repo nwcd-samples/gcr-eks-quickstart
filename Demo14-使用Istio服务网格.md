@@ -28,15 +28,15 @@ Istio 是一个完全开源的服务网格，作为透明的一层接入到现�
 ### 4.1 下载 istioctl
 
 ```bash
-# 下载 istioctl，本 Workshop 使用 1.12.9
+# 下载 istioctl，本 Workshop 使用 1.19.3
 # https://github.com/istio/istio/releases/
 mkdir istio && cd istio
-echo 'export ISTIO_VERSION="1.12.9"' >> ~/.bash_profile
+echo 'export ISTIO_VERSION="1.19.3"' >> ~/.bash_profile
 source ~/.bash_profile
 
-# 需要提前下载好'istio-1.12.9-linux-amd64.tar.gz'
-tar -xvf istio-1.12.9-linux-amd64.tar.gz
-sudo cp -v istio-1.12.9/bin/istioctl /usr/bin/
+# 需要提前下载好'istio-1.19.3-linux-amd64.tar.gz'
+tar -xvf istio-1.19.3-linux-amd64.tar.gz
+sudo cp -v istio-1.19.3/bin/istioctl /usr/bin/
 
 # 验证
 istioctl version --remote=false
