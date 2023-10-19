@@ -34,9 +34,9 @@ mkdir istio && cd istio
 echo 'export ISTIO_VERSION="1.12.9"' >> ~/.bash_profile
 source ~/.bash_profile
 
-# 下载并安装 istioctl
-curl -L https://istio.io/downloadIstio | sh -
-sudo cp -v istio-1.12.9/bin/istioctl /usr/local/bin/
+# 需要提前下载好'istio-1.12.9-linux-amd64.tar.gz'
+tar -xvf istio-1.12.9-linux-amd64.tar.gz
+sudo cp -v istio-1.12.9/bin/istioctl /usr/bin/
 
 # 验证
 istioctl version --remote=false
