@@ -8,37 +8,26 @@
 1.1 配置环境变量
 
 ``` 
-CLUSTER_NAME=prod
-AWS_REGION=cn-northwest-1
+export cluster_name=test
+export role_name=AmazonEKS_EFS_CSI_DriverRole
+export region=cn-northwest-1
 ```
 
-1.2 创建EFS CSI所需的IAM策略
-
-a.将IAM策略文件下载到本地
-
-```
-curl -o iam-policy-example.json https://raw.githubusercontent.com/kubernetes-sigs/aws-efs-csi-driver/v1.3.2/docs/iam-policy-example.json
-```
-b.创建IAM策略
-
-```
-POLICY_ARN=$(aws iam create-policy \
-    --policy-name AmazonEKS_EFS_CSI_Driver_Policy \
-    --policy-document file://iam-policy-example.json \
-    --query 'Policy.Arn' \
-    --output text)
-```
-1.3 创建IAM Service Account
+1.2 创建IAM Service Account
 
 ```
 eksctl create iamserviceaccount \
     --name efs-csi-controller-sa \
     --namespace kube-system \
-    --cluster $CLUSTER_NAME \
-    --attach-policy-arn $POLICY_ARN \
-    --approve \
-    --override-existing-serviceaccounts \
-    --region $AWS_REGION
+    --cluster $cluster_name \
+    --role-name $role_name \
+    --role-only \
+    --attach-policy-arn arn:aws-cn:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy \
+    --approve
+
+TRUST_POLICY=$(aws iam get-role --role-name $role_name --query 'Role.AssumeRolePolicyDocument' | \
+    sed -e 's/efs-csi-controller-sa/efs-csi-*/' -e 's/StringEquals/StringLike/')
+aws iam update-assume-role-policy --role-name $role_name --policy-document "$TRUST_POLICY"
 ```
 ### 2 安装EFS CSI驱动程序
 
@@ -46,14 +35,10 @@ eksctl create iamserviceaccount \
 
 ```
 kubectl kustomize \
-    "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.4" > public-ecr-driver.yaml
+    "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.7" > public-ecr-driver.yaml
 ```
-2.2 修改驱动程序配置文件，去掉Service Account部分
 
-```
-sed -i '1,8d' public-ecr-driver.yaml
-```
-2.3 安装EFS CSI驱动程序
+2.2 安装EFS CSI驱动程序
 
 ```
 kubectl apply -f public-ecr-driver.yaml
@@ -184,20 +169,21 @@ a. 查看Pod
 
 ```
 kubectl get pods
-efs-app   1/1     Running   0          17s
 ```
 b.查看PV, PVC
 
 ```
 kubectl get pv,pvc | grep efs
-persistentvolume/pvc-c55e2c43-a8e7-494d-a0e6-f3c6e16f1e3c   5Gi        RWX            Delete           Bound    default/efs-claim   efs-sc                  69s
-persistentvolumeclaim/efs-claim   Bound    pvc-c55e2c43-a8e7-494d-a0e6-f3c6e16f1e3c   5Gi        RWX            efs-sc         69s
 ```
 
 c.确认数据已经写入EFS文件系统
 
 ```
 kubectl exec efs-app -- bash -c "cat data/out"
+```
+输出显示
+
+```
 Wed Jul 6 07:14:04 UTC 2022
 Wed Jul 6 07:14:09 UTC 2022
 Wed Jul 6 07:14:14 UTC 2022
@@ -213,7 +199,10 @@ Wed Jul 6 07:14:34 UTC 2022
 kubectl delete -f pod.yaml
 
 # 删除EFS CSI驱动程序
-kubectl delete -f pod.yaml
+kubectl delete -f public-ecr-driver.yaml
+
+# 删除StorageClass
+kubectl delete -f storageclass.yaml
 
 # 删除EFS Mount Targets
 aws efs describe-mount-targets \
@@ -233,6 +222,4 @@ eksctl delete iamserviceaccount \
   --name efs-csi-controller-sa \
   --cluster $CLUSTER_NAME
 
-# 删除IAM Policy
-aws iam delete-policy --policy-arn $POLICY_ARN
 ```
