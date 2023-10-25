@@ -1,6 +1,8 @@
 # Demo05-使用Karpenter进行自动伸缩
 --
-#### Contributor: Kunyao Han
+#### Contributor: Yi Zheng
+#### 更新时间: 2023-10-18
+#### 基于EKS版本: EKS 1.27
 --
 
 karpenter是开源的k8s集群弹性伸缩服务，提供秒级的计算资源与应用匹配，在创建pod时，以最小延迟将node资源进行调度分配；其主要功能如下：
@@ -10,6 +12,16 @@ karpenter是开源的k8s集群弹性伸缩服务，提供秒级的计算资源�
 - 提供符合pods要求的节点
 - 安排pod在新节点上运行
 - 当不再需要这些节点时，移除这些节点
+
+## 1. 先决条件  
+1.1 准备实验环境：参考Demo 01  
+1.2 使用eksctl创建集群：参考Demo 02，不要执行 4. 镜像处置(针对中国区)  
+1.3 设置环境变量
+```
+AWS_REGION=cn-northwest-1
+AWS_DEFAULT_REGION=cn-northwest-1
+CLUSTER_NAME=eksworkshop
+```
 
 ## 1. 创建环境
 
