@@ -254,20 +254,34 @@ kind: Provisioner
 metadata:
   name: default
 spec:
-  labels:
-    intent: apps
-  provider:
-    instanceProfile: KarpenterNodeInstanceProfile-${CLUSTER_NAME}
-    tags:
-      accountingEC2Tag: KarpenterDevEnvironmentEC2
-  ttlSecondsAfterEmpty: 30
+  requirements:
+    - key: karpenter.sh/capacity-type
+      operator: In
+      values: ["spot"]
+  limits:
+    resources:
+      cpu: 1000
+  providerRef:
+    name: default
+  consolidation: 
+    enabled: true
+---
+apiVersion: karpenter.k8s.aws/v1alpha1
+kind: AWSNodeTemplate
+metadata:
+  name: default
+spec:
+  subnetSelector:
+    karpenter.sh/discovery: ${CLUSTER_NAME}
+  securityGroupSelector:
+    karpenter.sh/discovery: ${CLUSTER_NAME}
 EOF
 ```
 
 ### 3.2 显示 Karpenter 日志
 
 ```
-kubectl logs -f deployment/karpenter-controller -n karpenter
+kubectl logs -f deployment/karpenter -n karpenter
 ```
 
 ## 4. 自动节点配置
