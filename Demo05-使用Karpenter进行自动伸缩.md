@@ -198,10 +198,10 @@ echo $CLUSTER_ENDPOINT
 aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
 
 helm registry logout public.ecr.aws
-docker logout public.ecr.aws
 
 helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --version ${KARPENTER_VERSION} --namespace karpenter --create-namespace \
   --set serviceAccount.create=false \
+  --set serviceAccount.name=karpenter \
   --set settings.aws.clusterName=${CLUSTER_NAME} \
   --set settings.aws.defaultInstanceProfile=KarpenterNodeInstanceProfile-${CLUSTER_NAME} \
   --set settings.aws.interruptionQueueName=${CLUSTER_NAME} \
@@ -211,12 +211,14 @@ helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --vers
 输出显示：
 
 ```
-Release "karpenter" has been upgraded. Happy Helming!
+Release "karpenter" does not exist. Installing it now.
+Pulled: public.ecr.aws/karpenter/karpenter:v0.31.1
+Digest: sha256:0f0f4f12d688c62d6ba02ce2b73580c80f24767769ae0db21f17c027ee4dd711
 NAME: karpenter
-LAST DEPLOYED: Wed Jul 13 14:55:34 2022
+LAST DEPLOYED: Sun Oct 29 07:55:55 2023
 NAMESPACE: karpenter
 STATUS: deployed
-REVISION: 2
+REVISION: 1
 TEST SUITE: None
 ```
 
