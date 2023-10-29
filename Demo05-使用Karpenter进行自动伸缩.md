@@ -59,15 +59,15 @@ subnet-0321df0f0ae09292f,subnet-00ff18067fe034e2d,subnet-0debabfbcf7387bfd == su
 ### 1.3 创建karpenter节点IAM Role和实例profile
 
 ```
-TEMPOUT=$(mktemp)
-export KARPENTER_VERSION=v0.13.2
+export TEMPOUT=$(mktemp)
+export KARPENTER_VERSION=v0.31.1
 
-curl -fsSL https://karpenter.sh/"${KARPENTER_VERSION}"/getting-started/getting-started-with-eksctl/cloudformation.yaml  > $TEMPOUT \
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter/"${KARPENTER_VERSION}"/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml  > $TEMPOUT \
 && aws cloudformation deploy \
-  --stack-name Karpenter-${CLUSTER_NAME} \
-  --template-file ${TEMPOUT} \
+  --stack-name "Karpenter-${CLUSTER_NAME}" \
+  --template-file "${TEMPOUT}" \
   --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides ClusterName=${CLUSTER_NAME}
+  --parameter-overrides "ClusterName=${CLUSTER_NAME}"
 ```
 
 输出显示：
