@@ -28,27 +28,14 @@ SUBNET_IDS=$(aws cloudformation describe-stacks \
 aws ec2 create-tags \
     --resources $(echo $SUBNET_IDS | tr ',' '\n') \
     --tags Key="karpenter.sh/discovery",Value="${CLUSTER_NAME}"
-```
 
-如果子网信息tag不成功，可以尝试手工将subnet-id进行输入
-
-```
+Security_group_ids=$(aws cloudformation describe-stacks \
+    --stack-name eksctl-${CLUSTER_NAME}-cluster \
+    --query 'Stacks[].Outputs[?OutputKey==`SecurityGroup`].OutputValue' \
+    --output text)
 aws ec2 create-tags \
-    --resources $(echo subnet-0321df0f0ae09292f,subnet-00ff18067fe034e2d,subnet-0debabfbcf7387bfd | tr ',' '\n') \
-    --tags Key="kubernetes.io/cluster/${CLUSTER_NAME}",Value=
-```
-
-检查子网信息
-
-```
-VALIDATION_SUBNETS_IDS=$(aws ec2 describe-subnets --filters Name=tag:"kubernetes.io/cluster/${CLUSTER_NAME}",Values= --query "Subnets[].SubnetId" --output text | sed 's/\t/,/')
-echo "$SUBNET_IDS == $VALIDATION_SUBNETS_IDS"
-```
-
-输出显示：
-
-```
-subnet-0321df0f0ae09292f,subnet-00ff18067fe034e2d,subnet-0debabfbcf7387bfd == subnet-0321df0f0ae09292f,subnet-0debabfbcf7387bfd	subnet-00ff18067fe034e2d
+    --resources $(echo $Security_group_ids | tr ',' '\n') \
+    --tags Key="karpenter.sh/discovery",Value="${CLUSTER_NAME}"
 ```
 ### 1.3 创建karpenter节点IAM Role和实例profile
 
