@@ -205,14 +205,20 @@ version.BuildInfo{Version:"v3.12.3", GitCommit:"3a31588ad33fe3b89af5a2a54ee1d25b
 ### 2.2 使用Helm Chart 安装Karpenter
 
 ```
-helm repo add karpenter https://charts.karpenter.sh
-helm repo update
-helm upgrade --install karpenter karpenter/karpenter --namespace karpenter \
-  --create-namespace --set serviceAccount.create=false --version 0.4.3 \
-  --set controller.clusterName=${CLUSTER_NAME} \
-  --set controller.clusterEndpoint=$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.endpoint" --output json) \
-  --set defaultProvisioner.create=false \
-  --wait # for the defaulting webhook to install before creating a Provisioner
+export CLUSTER_ENDPOINT="$(aws eks describe-cluster --name ${CLUSTER_NAME} --query "cluster.endpoint" --output text)"
+echo $CLUSTER_ENDPOINT
+
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com || true
+
+helm registry logout public.ecr.aws
+docker logout public.ecr.aws
+
+helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --version ${KARPENTER_VERSION} --namespace karpenter --create-namespace \
+  --set serviceAccount.create=false \
+  --set settings.aws.clusterName=${CLUSTER_NAME} \
+  --set settings.aws.defaultInstanceProfile=KarpenterNodeInstanceProfile-${CLUSTER_NAME} \
+  --set settings.aws.interruptionQueueName=${CLUSTER_NAME} \
+  --wait
 ```
 
 输出显示：
