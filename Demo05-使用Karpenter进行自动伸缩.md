@@ -86,7 +86,8 @@ eksctl create iamidentitymapping \
   --cluster  ${CLUSTER_NAME} \
   --arn arn:aws-cn:iam::${ACCOUNT_ID}:role/KarpenterNodeRole-${CLUSTER_NAME} \
   --group system:bootstrappers \
-  --group system:nodes
+  --group system:nodes \
+  --region ${AWS_REGION}
 ```
 
 输出显示：
