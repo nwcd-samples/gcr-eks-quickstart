@@ -254,6 +254,8 @@ spec:
     name: default
   consolidation: 
     enabled: true
+  labels:
+    app: inflate
 ---
 apiVersion: karpenter.k8s.aws/v1alpha1
 kind: AWSNodeTemplate
