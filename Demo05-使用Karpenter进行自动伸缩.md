@@ -18,7 +18,7 @@ export CLUSTER_NAME=$(eksctl get clusters -o json | jq -r '.[0].Name')
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
 export AWS_REGION=cn-northwest-1
 ```
-### 1.2 标记子网
+### 1.2 标记子网和安全组
 
 ```
 SUBNET_IDS=$(aws cloudformation describe-stacks \
@@ -27,7 +27,7 @@ SUBNET_IDS=$(aws cloudformation describe-stacks \
     --output text)
 aws ec2 create-tags \
     --resources $(echo $SUBNET_IDS | tr ',' '\n') \
-    --tags Key="kubernetes.io/cluster/${CLUSTER_NAME}",Value=
+    --tags Key="karpenter.sh/discovery",Value="${CLUSTER_NAME}"
 ```
 
 如果子网信息tag不成功，可以尝试手工将subnet-id进行输入
