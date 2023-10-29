@@ -143,7 +143,7 @@ Events:  <none>
 创建IAM OIDC Identity Provider for the cluster
 
 ```
-eksctl utils associate-iam-oidc-provider --cluster ${CLUSTER_NAME} --approve
+eksctl utils associate-iam-oidc-provider --cluster ${CLUSTER_NAME} --approve --region ${AWS_REGION}
 ```
 
 输出显示：
