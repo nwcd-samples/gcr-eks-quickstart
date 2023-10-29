@@ -157,6 +157,8 @@ eksctl utils associate-iam-oidc-provider --cluster ${CLUSTER_NAME} --approve --r
 创建AWS IAM Role, Kubernetes service account, 并使用 IAM Roles for Service Accounts (IRSA)
 
 ```
+export ACCOUNT_ID=<> # <>--->替换成Account ID
+
 eksctl create iamserviceaccount \
   --cluster $CLUSTER_NAME --name karpenter --namespace karpenter \
   --attach-policy-arn arn:aws-cn:iam::$ACCOUNT_ID:policy/KarpenterControllerPolicy-$CLUSTER_NAME \
