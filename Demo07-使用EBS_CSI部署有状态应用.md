@@ -1,8 +1,8 @@
 # Demo07-使用EBS CSI部署有状态应用
 --
 #### Contributor: Tao Dai
-#### 更新时间: 2023-09-19
-#### 基于EKS版本: EKS 1.27
+#### 更新时间: 2024-01-18
+#### 基于EKS版本: EKS 1.28
 
 ### 先决条件
 为集群创建IAM OIDC提供商
@@ -12,71 +12,33 @@ eksctl utils associate-iam-oidc-provider --cluster test --approve
 ```
 ### 1.配置EBS CSI所需IAM权限
 
-
-1.1 创建IAM策略
-
-a.将IAM Policy文件下载到本地
+使用eksctl创建EBS CSI使用的IAM Service Account
 
 ```
-curl -o example-iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-ebs-csi-driver/master/docs/example-iam-policy.json
-```
-b.更新IAM Policy文件以便中国区使用
-
-```
-sed -i 's/arn:aws/arn:aws-cn/g' example-iam-policy.json
-
-```
-c.创建IAM Policy
-
-```
-POLICY_ARN=$(aws iam create-policy \
-    --policy-name AmazonEKS_EBS_CSI_Driver_Policy \
-    --policy-document file://example-iam-policy.json \
-    --query 'Policy.Arn' \
-    --output text)
-```
-
-1.2 创建EBS CSI使用的IAM Service Account
-
-a.使用eksctl创建IAM Service Account
-
-```
-CLUSTER_NAME=test
+export CLUSTER_NAME=test
 
 eksctl create iamserviceaccount \
     --name ebs-csi-controller-sa \
     --namespace kube-system \
-    --cluster $CLUSTER_NAME  \
-    --attach-policy-arn $POLICY_ARN \
-    --approve \
-    --override-existing-serviceaccounts
-```
-b.获取EBS CSI IAM Role的ARN
-
-```
-ROLE_ARN=$(aws cloudformation describe-stacks \
-    --stack-name eksctl-$CLUSTER_NAME-addon-iamserviceaccount-kube-system-ebs-csi-controller-sa \
-    --query='Stacks[].Outputs[?OutputKey==`Role1`].OutputValue' \
-    --output text)
+    --cluster $CLUSTER_NAME \
+    --role-name AmazonEKS_EBS_CSI_DriverRole \
+    --role-only \
+    --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+    --approve
 ```
 ### 2.部署EBS CSI Driver插件
 
-2.1 中国区使用国内容器镜像站
-
-```
-kubectl apply -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
-```
-2.2 使用eksctl部署EBS CSI Driver插件
-<br>test替换成当前EKS集群名称，1234567890替换成当前AWS中国区域账号ID
+2.1 使用eksctl部署EBS CSI Driver插件
+<br>1234567890替换成当前AWS中国区域账号ID
 
 ```
 eksctl create addon \
 	--name aws-ebs-csi-driver \
-	--cluster test \
+	--cluster $CLUSTER_NAME \
 	--service-account-role-arn arn:aws-cn:iam::1234567890:role/AmazonEKS_EBS_CSI_DriverRole \
 	--force
 ```
-2.3 查看EBS CSI Driver插件
+2.2 查看EBS CSI Driver插件
 
 ```
 eksctl get addon --name aws-ebs-csi-driver --cluster test
@@ -147,7 +109,4 @@ eksctl delete addon --cluster test --name aws-ebs-csi-driver --preserve
 eksctl delete iamserviceaccount \
   --name ebs-csi-controller-sa \
   --cluster $CLUSTER_NAME
-
-# 删除IAM Policy
-aws iam delete-policy --policy-arn $POLICY_ARN
 ```
