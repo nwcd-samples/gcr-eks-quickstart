@@ -8,10 +8,10 @@
 ## 0. 先决条件  
 使用eksctl创建集群：
 ```
-~]$ AWS_REGION=cn-northwest-1
-~]$ AWS_DEFAULT_REGION=cn-northwest-1
-~]$ CLUSTER_NAME=eksworkshop
-~]$ eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --region=${AWS_REGION} --version 1.30 -N 1
+export AWS_REGION=cn-northwest-1
+export AWS_DEFAULT_REGION=cn-northwest-1
+export CLUSTER_NAME=eksworkshop
+eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --region=${AWS_REGION} --version 1.30 -N 1
 ```
 
 ## 1. 创建环境
@@ -25,6 +25,12 @@ export K8S_VERSION="1.30"
 export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 export ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 export TEMPOUT=$(mktemp)
+
+export AWS_PARTITION="aws-cn" # if you are not using standard partitions, you may need to configure to aws-cn / aws-us-gov
+export ARM_AMI_ID="$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/${K8S_VERSION}/amazon-linux-2-arm64/recommended/image_id --query Parameter.Value --output text)"
+export AMD_AMI_ID="$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/${K8S_VERSION}/amazon-linux-2/recommended/image_id --query Parameter.Value --output text)"
+export GPU_AMI_ID="$(aws ssm get-parameter --name /aws/service/eks/optimized-ami/${K8S_VERSION}/amazon-linux-2-gpu/recommended/image_id --query Parameter.Value --output text)"
+
 ```
 ### 1.2 标记子网和安全组
 
@@ -48,7 +54,7 @@ aws ec2 create-tags \
 ### 1.3 创建karpenter节点IAM Role和实例profile
 
 ```
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter/"${KARPENTER_VERSION}"/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml  > $TEMPOUT \
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/v"${KARPENTER_VERSION}"/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml  > "${TEMPOUT}" \
 && aws cloudformation deploy \
   --stack-name "Karpenter-${CLUSTER_NAME}" \
   --template-file "${TEMPOUT}" \
