@@ -121,59 +121,20 @@ Events:  <none>
 eksctl utils associate-iam-oidc-provider --cluster ${CLUSTER_NAME} --approve --region ${AWS_REGION}
 ```
 
-输出显示：
-
-```
-2022-07-11 17:53:42 [ℹ]  eksctl version 0.90.0
-2022-07-11 17:53:42 [ℹ]  using region cn-northwest-1
-2022-07-11 17:53:42 [ℹ]  IAM Open ID Connect provider is already associated with cluster "eks0707" in "cn-northwest-1"
-```
-
 创建AWS IAM Role, Kubernetes service account, 并使用 IAM Roles for Service Accounts (IRSA)
 
 ```
-eksctl create iamserviceaccount \
-  --cluster $CLUSTER_NAME --name karpenter --namespace karpenter \
-  --attach-policy-arn arn:aws-cn:iam::aws:policy/AdministratorAccess \
-  --approve \
-  --region ${AWS_REGION}
-
 eksctl create iamserviceaccount \
   --cluster $CLUSTER_NAME --name karpenter --namespace karpenter \
   --attach-policy-arn arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerPolicy-${CLUSTER_NAME} \
   --approve \
   --region ${AWS_REGION}
 ```
-输出显示：
-
-```
-2022-07-11 17:54:37 [ℹ]  eksctl version 0.90.0
-2022-07-11 17:54:37 [ℹ]  using region cn-northwest-1
-2022-07-11 17:54:39 [ℹ]  1 iamserviceaccount (karpenter/karpenter) was included (based on the include/exclude rules)
-2022-07-11 17:54:39 [!]  serviceaccounts that exist in Kubernetes will be excluded, use --override-existing-serviceaccounts to override
-2022-07-11 17:54:39 [ℹ]  1 task: {
-    2 sequential sub-tasks: {
-        create IAM role for serviceaccount "karpenter/karpenter",
-        create serviceaccount "karpenter/karpenter",
-    } }2022-07-11 17:54:39 [ℹ]  building iamserviceaccount stack "eksctl-eks0707-addon-iamserviceaccount-karpenter-karpenter"
-2022-07-11 17:54:39 [ℹ]  deploying stack "eksctl-eks0707-addon-iamserviceaccount-karpenter-karpenter"
-2022-07-11 17:54:39 [ℹ]  waiting for CloudFormation stack "eksctl-eks0707-addon-iamserviceaccount-karpenter-karpenter"
-2022-07-11 17:54:55 [ℹ]  waiting for CloudFormation stack "eksctl-eks0707-addon-iamserviceaccount-karpenter-karpenter"
-2022-07-11 17:54:56 [ℹ]  created namespace "karpenter"
-2022-07-11 17:54:56 [ℹ]  created serviceaccount "karpenter/karpenter"
-```
 
 检查service account
 
 ```
 kubectl get serviceaccounts --namespace karpenter
-```
-输出显示：
-
-```
-NAME        SECRETS   AGE
-default     1         44s
-karpenter   1         44s
 ```
 
 ## 2. 安装 KARPENTER
@@ -233,35 +194,87 @@ kubectl get deployment -n karpenter
 ### 3.1 设置默认的 CRD Provisioner
 
 ```
-cat <<EOF | kubectl apply -f -
-apiVersion: karpenter.sh/v1alpha5
-kind: Provisioner
+cat <<EOF | envsubst | kubectl apply -f -
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
 metadata:
   name: default
 spec:
-  requirements:
-    - key: karpenter.sh/capacity-type
-      operator: In
-      values: ["spot"]
+  template:
+    spec:
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["c", "m", "r"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["2"]
+      nodeClassRef:
+        apiVersion: karpenter.k8s.aws/v1beta1
+        kind: EC2NodeClass
+        name: default
   limits:
-    resources:
-      cpu: 1000
-  providerRef:
-    name: default
-  consolidation: 
-    enabled: true
+    cpu: 1000
+  disruption:
+    consolidationPolicy: WhenUnderutilized
+    expireAfter: 720h # 30 * 24h = 720h
 ---
-apiVersion: karpenter.k8s.aws/v1alpha1
-kind: AWSNodeTemplate
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
 metadata:
   name: default
 spec:
-  subnetSelector:
-    karpenter.sh/discovery: ${CLUSTER_NAME}
-  securityGroupSelector:
-    karpenter.sh/discovery: ${CLUSTER_NAME}
+  amiFamily: AL2 # Amazon Linux 2
+  role: "KarpenterNodeRole-${CLUSTER_NAME}" # replace with your cluster name
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}" # replace with your cluster name
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}" # replace with your cluster name
+  amiSelectorTerms:
+    - id: "${ARM_AMI_ID}"
+    - id: "${AMD_AMI_ID}"
+#   - id: "${GPU_AMI_ID}" # <- GPU Optimized AMD AMI 
+#   - name: "amazon-eks-node-${K8S_VERSION}-*" # <- automatically upgrade when a new AL2 EKS Optimized AMI is released. This is unsafe for production workloads. Validate AMIs in lower environments before deploying them to production.
 EOF
+```
 
+### 3.2 手动修改Service Account IAM Role
+
+```
+kubectl describe sa  karpenter -n karpenter | egrep Annotations
+Annotations:         eks.amazonaws.com/role-arn: arn:aws-cn:iam::332433839685:role/eksctl-eksworkshop-addon-iamserviceaccount-ka-Role1-cxMapWHVHZGj
+
+# 删除arn:aws-cn:iam::332433839685:role/eksctl-eksworkshop-addon-iamserviceaccount-ka-Role1-cxMapWHVHZGj中的如下部分
+# 原始策略
+{
+    "Sid": "AllowPassingInstanceRole",
+    "Effect": "Allow",
+    "Resource": "arn:aws-cn:iam::332433839685:role/KarpenterNodeRole-eksworkshop",
+    "Action": "iam:PassRole",
+    "Condition": {
+        "StringEquals": {
+            "iam:PassedToService": "ec2.amazonaws.com"
+        }
+    }
+},
+# 修改策略
+{
+    "Sid": "AllowPassingInstanceRole",
+    "Effect": "Allow",
+    "Resource": "arn:aws-cn:iam::332433839685:role/KarpenterNodeRole-eksworkshop",
+    "Action": "iam:PassRole"
+},
 ```
 
 ## 4. 自动节点配置
@@ -292,12 +305,9 @@ spec:
             requests:
               cpu: 1
 EOF
+
 kubectl scale deployment inflate --replicas 5
-kubectl logs -f -n karpenter -l app.kubernetes.io/name=karpenter -c controller
-2023-10-29T13:36:07.995Z        INFO    controller      Starting informers...   {"commit": "61b3e1e-dirty"}
-2023-10-29T13:37:59.196Z        INFO    controller.machine.lifecycle    launched machine        {"commit": "61b3e1e-dirty", "machine": "default-bmr6l", "provisioner": "default", "provider-id": "aws:///cn-northwest-1c/i-0b7b012bb90671250", "instance-type": "c4.xlarge", "zone": "cn-northwest-1c", "capacity-type": "spot", "allocatable": {"cpu":"3920m","ephemeral-storage":"17Gi","memory":"6111Mi","pods":"58"}}
-2023-10-29T13:38:23.236Z        DEBUG   controller.machine.lifecycle    registered machine      {"commit": "61b3e1e-dirty", "machine": "default-bmr6l", "provisioner": "default", "provider-id": "aws:///cn-northwest-1c/i-0b7b012bb90671250", "node": "ip-192-168-98-76.cn-northwest-1.compute.internal"}
-2023-10-29T13:38:34.435Z        DEBUG   controller.machine.lifecycle    initialized machine     {"commit": "61b3e1e-dirty", "machine": "default-bmr6l", "provisioner": "default", "provider-id": "aws:///cn-northwest-1c/i-0b7b012bb90671250", "node": "ip-192-168-98-76.cn-northwest-1.compute.internal"}
+kubectl logs -f -n "${KARPENTER_NAMESPACE}" -l app.kubernetes.io/name=karpenter -c controller
 ```
 
 ### 4.2 将pod的数量缩减至0观察
