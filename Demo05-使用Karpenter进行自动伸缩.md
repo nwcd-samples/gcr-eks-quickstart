@@ -62,14 +62,6 @@ curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/v"${KARP
   --parameter-overrides "ClusterName=${CLUSTER_NAME}"
 ```
 
-输出显示：
-
-```
-Waiting for changeset to be created..
-Waiting for stack create/update to complete
-Successfully created/updated stack - Karpenter-eksworkshop
-```
-
 给实例授权使其可以使用之前创建的profile来连接eks集群。
 
 ```
@@ -79,13 +71,6 @@ eksctl create iamidentitymapping \
   --group system:bootstrappers \
   --group system:nodes \
   --cluster ${CLUSTER_NAME}
-```
-
-输出显示：
-
-```
-2023-10-29 08:46:23 [ℹ]  checking arn arn:aws-cn:iam::332433839685:role/KarpenterNodeRole-eksworkshop against entries in the auth ConfigMap
-2023-10-29 08:46:23 [ℹ]  adding identity "arn:aws-cn:iam::332433839685:role/KarpenterNodeRole-eksworkshop" to auth ConfigMap
 ```
 
 检查 AWS auth map
