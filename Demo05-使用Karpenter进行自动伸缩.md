@@ -216,9 +216,8 @@ helm registry logout public.ecr.aws
 helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --version ${KARPENTER_VERSION} --namespace karpenter --create-namespace \
   --set serviceAccount.create=false \
   --set serviceAccount.name=karpenter \
-  --set settings.aws.clusterName=${CLUSTER_NAME} \
-  --set settings.aws.defaultInstanceProfile=KarpenterNodeInstanceProfile-${CLUSTER_NAME} \
-  --set settings.aws.interruptionQueueName=${CLUSTER_NAME} \
+  --set settings.clusterName=${CLUSTER_NAME} \
+  --set settings.interruptionQueue=${CLUSTER_NAME} \
   --wait
 ```
 
