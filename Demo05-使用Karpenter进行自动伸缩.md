@@ -2,12 +2,15 @@
 --
 #### Contributor: Yi Zheng
 #### 更新时间: 2023-10-29
-#### 基于EKS版本: EKS 1.27
+#### 基于EKS版本: EKS 1.30
 --
 
 ## 0. 先决条件  
 使用eksctl创建集群：
 ```
+~]$ AWS_REGION=cn-northwest-1
+~]$ AWS_DEFAULT_REGION=cn-northwest-1
+~]$ CLUSTER_NAME=eksworkshop
 ~]$ eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --region=${AWS_REGION} --version 1.30 -N 1
 ```
 
@@ -16,10 +19,9 @@
 ### 1.1 前置条件
 
 ```
-export KARPENTER_VERSION=v0.31.1
-export CLUSTER_NAME=$(eksctl get clusters -o json | jq -r '.[0].Name')
-export AWS_DEFAULT_REGION="cn-northwest-1"
-export AWS_REGION="cn-northwest-1"
+export KARPENTER_NAMESPACE="kube-system"
+export KARPENTER_VERSION="0.37.0"
+export K8S_VERSION="1.30"
 export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 export ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 export TEMPOUT=$(mktemp)
