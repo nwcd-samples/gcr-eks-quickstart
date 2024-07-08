@@ -6,8 +6,10 @@
 --
 
 ## 0. 先决条件  
-0.1 准备实验环境：参考Demo 01  
-0.2 使用eksctl创建集群：参考Demo 02，不要执行 4. 镜像处置(针对中国区)  
+使用eksctl创建集群：
+```
+~]$ eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --region=${AWS_REGION} --version 1.30 -N 1
+```
 
 ## 1. 创建环境
 
