@@ -255,7 +255,7 @@ EOF
 kubectl describe sa  karpenter -n karpenter | egrep Annotations
 Annotations:         eks.amazonaws.com/role-arn: arn:aws-cn:iam::332433839685:role/eksctl-eksworkshop-addon-iamserviceaccount-ka-Role1-cxMapWHVHZGj
 
-# 删除arn:aws-cn:iam::332433839685:role/eksctl-eksworkshop-addon-iamserviceaccount-ka-Role1-cxMapWHVHZGj中的如下部分
+# 修改arn:aws-cn:iam::332433839685:role/eksctl-eksworkshop-addon-iamserviceaccount-ka-Role1-cxMapWHVHZGj中的如下部分
 # 原始策略
 {
     "Sid": "AllowPassingInstanceRole",
@@ -273,7 +273,12 @@ Annotations:         eks.amazonaws.com/role-arn: arn:aws-cn:iam::332433839685:ro
     "Sid": "AllowPassingInstanceRole",
     "Effect": "Allow",
     "Resource": "arn:aws-cn:iam::332433839685:role/KarpenterNodeRole-eksworkshop",
-    "Action": "iam:PassRole"
+    "Action": "iam:PassRole",
+    "Condition": {
+        "StringEquals": {
+            "iam:PassedToService": "ec2.cn-northwest-1.amazonaws.com.cn"
+        }
+    }
 },
 ```
 
