@@ -225,10 +225,8 @@ helm upgrade --install karpenter oci://public.ecr.aws/karpenter/karpenter --vers
 
 ```
 Release "karpenter" does not exist. Installing it now.
-Pulled: public.ecr.aws/karpenter/karpenter:v0.31.1
-Digest: sha256:0f0f4f12d688c62d6ba02ce2b73580c80f24767769ae0db21f17c027ee4dd711
 NAME: karpenter
-LAST DEPLOYED: Sun Oct 29 07:55:55 2023
+LAST DEPLOYED: Mon Jul  8 11:23:38 2024
 NAMESPACE: karpenter
 STATUS: deployed
 REVISION: 1
