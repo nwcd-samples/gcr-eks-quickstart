@@ -19,7 +19,7 @@ eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --r
 ### 1.1 前置条件
 
 ```
-export KARPENTER_NAMESPACE="kube-system"
+export KARPENTER_NAMESPACE="karpenter"
 export KARPENTER_VERSION="0.37.0"
 export K8S_VERSION="1.30"
 export AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
@@ -273,12 +273,7 @@ Annotations:         eks.amazonaws.com/role-arn: arn:aws-cn:iam::332433839685:ro
     "Sid": "AllowPassingInstanceRole",
     "Effect": "Allow",
     "Resource": "arn:aws-cn:iam::332433839685:role/KarpenterNodeRole-eksworkshop",
-    "Action": "iam:PassRole",
-    "Condition": {
-        "StringEquals": {
-            "iam:PassedToService": "ec2.cn-northwest-1.amazonaws.com.cn"
-        }
-    }
+    "Action": "iam:PassRole"
 },
 ```
 
