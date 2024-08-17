@@ -11,7 +11,7 @@
 export AWS_REGION=cn-northwest-1
 export AWS_DEFAULT_REGION=cn-northwest-1
 export CLUSTER_NAME=eksworkshop
-eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --region=${AWS_REGION} --version 1.30 -N 1
+eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --region=${AWS_REGION} --version 1.30 -N 1 --node-ami ami-0f868947924620368
 ```
 
 ## 1. 创建环境
