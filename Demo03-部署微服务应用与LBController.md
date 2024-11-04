@@ -1,36 +1,36 @@
 # Demo03-部署微服务应用与Amazon Load Balancer Controller
 --
 #### Contributor: Zhengyu Ren
-#### 更新时间: 2023-08-09
-#### 基于EKS版本: EKS 1.27
+#### 更新时间: 2023-11-04
+#### 基于EKS版本: EKS 1.31
 --
 
 ## 1. 部署微服务应用
 ### 1.1 获取实验样例
 ```
 #Ruby FrontEnd
-git clone https://github.com/brentley/ecsdemo-frontend.git
+$ git clone https://github.com/brentley/ecsdemo-frontend.git
 
 #NodeJS Backend and crystal backend
-git clone https://github.com/brentley/ecsdemo-nodejs.git
-git clone https://github.com/brentley/ecsdemo-crystal.git
+$ git clone https://github.com/brentley/ecsdemo-nodejs.git
+$ git clone https://github.com/brentley/ecsdemo-crystal.git
 ```
 
 ### 1.2 部署后台应用
 ```
 # 部署nodejs应用
-kubectl apply -f ecsdemo-nodejs/kubernetes/deployment.yaml
-kubectl apply -f ecsdemo-nodejs/kubernetes/service.yaml
+$ kubectl apply -f ecsdemo-nodejs/kubernetes/deployment.yaml
+$ kubectl apply -f ecsdemo-nodejs/kubernetes/service.yaml
 
 # 检查部署是否正确
-kubectl get deployment ecsdemo-nodejs
+$ kubectl get deployment ecsdemo-nodejs
 
 # 部署crystal应用
-kubectl apply -f ecsdemo-crystal/kubernetes/deployment.yaml
-kubectl apply -f ecsdemo-crystal/kubernetes/service.yaml
+$ kubectl apply -f ecsdemo-crystal/kubernetes/deployment.yaml
+$ kubectl apply -f ecsdemo-crystal/kubernetes/service.yaml
 
 # 检查部署是否正确
-kubectl get deployment ecsdemo-crystal
+$ kubectl get deployment ecsdemo-crystal
 ```
 
 ### 1.3 部署前台应用
@@ -41,20 +41,20 @@ AWS_REGION='cn-northwest-1'
 aws iam get-role --role-name "AWSServiceRoleForElasticLoadBalancing" --region ${AWS_REGION} || aws iam create-service-linked-role --aws-service-name "elasticloadbalancing.amazonaws.com" --region ${AWS_REGION}
 
 #部署
-kubectl apply -f ecsdemo-frontend/kubernetes/deployment.yaml
-kubectl apply -f ecsdemo-frontend/kubernetes/service.yaml
-kubectl get deployment ecsdemo-frontend
+$ kubectl apply -f ecsdemo-frontend/kubernetes/deployment.yaml
+$ kubectl apply -f ecsdemo-frontend/kubernetes/service.yaml
+$ kubectl get deployment ecsdemo-frontend
 
 # 检查状态
-kubectl get service ecsdemo-frontend -o wide
+$ kubectl get service ecsdemo-frontend -o wide
 
 # 访问前端服务
-ELB=$(kubectl get service ecsdemo-frontend -o json | jq -r '.status.loadBalancer.ingress[].hostname')
-echo ${ELB}
+$ ELB=$(kubectl get service ecsdemo-frontend -o json | jq -r '.status.loadBalancer.ingress[].hostname')
+$ echo ${ELB}
 
 # ELB创建至Active状态通常需要数分钟时间, 建议等待3-5mins后执行后续操作
 # 浏览器访问或者通过curl命令进行验证
-curl -m3 -v $ELB
+$ curl -m3 -v $ELB
 ```
 
 ### 1.4 微服务部署扩展
@@ -62,18 +62,18 @@ curl -m3 -v $ELB
 
 ```
 # 每一个微服务目前都只有一个部署单元
-kubectl get deployments
+$ kubectl get deployments
 # NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 # ecsdemo-crystal    1/1     1            1           19m
 # ecsdemo-frontend   1/1     1            1           7m51s
 # ecsdemo-nodejs     1/1     1            1           24m
 
 # scale 到3个replicas
-kubectl scale deployment ecsdemo-nodejs --replicas=3
-kubectl scale deployment ecsdemo-crystal --replicas=3
-kubectl scale deployment ecsdemo-frontend --replicas=3
+$ kubectl scale deployment ecsdemo-nodejs --replicas=3
+$ kubectl scale deployment ecsdemo-crystal --replicas=3
+$ kubectl scale deployment ecsdemo-frontend --replicas=3
 
-kubectl get deployments
+$ kubectl get deployments
 # NAME               READY   UP-TO-DATE   AVAILABLE   AGE
 # ecsdemo-crystal    3/3     3            3           21m
 # ecsdemo-frontend   3/3     3            3           9m51s
@@ -82,14 +82,14 @@ kubectl get deployments
 
 ### 1.5 清除资源
 ```
-kubectl delete -f ecsdemo-frontend/kubernetes/service.yaml
-kubectl delete -f ecsdemo-frontend/kubernetes/deployment.yaml
+$ kubectl delete -f ecsdemo-frontend/kubernetes/service.yaml
+$ kubectl delete -f ecsdemo-frontend/kubernetes/deployment.yaml
 
-kubectl delete -f ecsdemo-crystal/kubernetes/service.yaml
-kubectl delete -f ecsdemo-crystal/kubernetes/deployment.yaml
+$ kubectl delete -f ecsdemo-crystal/kubernetes/service.yaml
+$ kubectl delete -f ecsdemo-crystal/kubernetes/deployment.yaml
 
-kubectl delete -f ecsdemo-nodejs/kubernetes/service.yaml
-kubectl delete -f ecsdemo-nodejs/kubernetes/deployment.yaml
+$ kubectl delete -f ecsdemo-nodejs/kubernetes/service.yaml
+$ kubectl delete -f ecsdemo-nodejs/kubernetes/deployment.yaml
 ```
 
 ## 2. 使用Amazon Load Balancer Controller
@@ -101,32 +101,32 @@ kubectl delete -f ecsdemo-nodejs/kubernetes/deployment.yaml
 
 #### 2.1.1 创建EKS OIDC Provider (这个操作每个集群只需要做一次）
 ```
-AWS_REGION='cn-northwest-1'
-CLUSTER_NAME='eksworkshop'
+$ AWS_REGION='cn-northwest-1'
+$ CLUSTER_NAME='eksworkshop'
 
-eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
+$ eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
 
-#2023-08-09 13:59:49 [ℹ]  will create IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
-#2023-08-09 13:59:50 [✔]  created IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
+2024-11-04 11:25:42 [ℹ]  will create IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
+2024-11-04 11:25:44 [✔]  created IAM Open ID Connect provider for cluster "eksworkshop" in "cn-northwest-1"
 ```
 
 #### 2.1.2 创建所需要的IAM policy
 ```
 #下载针对中国区的策略
-curl -o iam_policy_cn.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.0/docs/install/iam_policy_cn.json
+$ curl -o iam_policy_cn.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.0/docs/install/iam_policy_cn.json
 
 #创建IAM策略
-aws iam create-policy \
+$ aws iam create-policy \
     --policy-name AWSLoadBalancerControllerIAMPolicy \
     --policy-document file://iam_policy_cn.json --region ${AWS_REGION}
 
 #获取Policy ARN
-POLICY_NAME=$(aws iam list-policies | egrep 'AWSLoadBalancerControllerIAMPolicy'|grep 'Arn'|awk '{print $2}'|awk -F ',' '{print$1}')
+$ POLICY_NAME=$(aws iam list-policies | egrep 'AWSLoadBalancerControllerIAMPolicy'|grep 'Arn'|awk '{print $2}'|awk -F ',' '{print$1}')
 ```
 
 #### 2.1.3 使用上述创建的IAM Policy ARN来创建Service Account
 ```
-eksctl create iamserviceaccount \
+$ eksctl create iamserviceaccount \
   --cluster=${CLUSTER_NAME} \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
@@ -154,13 +154,13 @@ eksctl create iamserviceaccount \
 1.添加 eks-charts Repo
 
 ```
-helm repo add eks https://aws.github.io/eks-charts
+$ helm repo add eks https://aws.github.io/eks-charts
 ```
 
 2.更新您的Repo, 以确保正确的部署进行后续步骤
 
 ```
-helm repo update
+$ helm repo update
 
 #Hang tight while we grab the latest from your chart repositories...
 #...Successfully got an update from the "koderover-chart" chart repository
@@ -190,17 +190,17 @@ Helm安装参考文档: [https://docs.amazonaws.cn/eks/latest/userguide/helm.htm
 AWS_REGION='cn-northwest-1'
 CLUSTER_NAME='eksworkshop'
 
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+$ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   -n kube-system \
   --set clusterName=${CLUSTER_NAME} \
-  --set serviceAccount.create=false \
+  --set serviceAccount.create=true \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set enableShield=false \
   --set enableWaf=false \
   --set enableWafv2=false
 
 #NAME: aws-load-balancer-controller
-#LAST DEPLOYED: Wed Aug  9 14:04:41 2023
+#LAST DEPLOYED: Mon Nov  4 13:22:07 2024
 #NAMESPACE: kube-system
 #STATUS: deployed
 #REVISION: 1
@@ -209,7 +209,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
 #AWS Load Balancer controller installed!
 
 #验证控制器是否已安装
-kubectl get deployment -n kube-system aws-load-balancer-controller
+$ kubectl get deployment -n kube-system aws-load-balancer-controller
 
 #NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
 #aws-load-balancer-controller   2/2     2            2           20m
@@ -238,7 +238,7 @@ spec:
     spec:
       containers:
       - name: nginx-1
-        image: nginx
+        image: public.ecr.aws/nginx/nginx:latest
         ports:
         - containerPort: 80
 ---
@@ -258,47 +258,44 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
- annotations:
-   alb.ingress.kubernetes.io/scheme: internet-facing
-   alb.ingress.kubernetes.io/target-type: ip
-   kubernetes.io/ingress.class: alb
- creationTimestamp: null
- labels:
-   app: nginx
- name: "nginx-1"
- namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  labels:
+    app: nginx
+  name: "nginx-1"
+  namespace: default
 spec:
- rules:
- - http:
-     paths:
-     - backend:
-         service:
-           name: "nginx-1"
-           port:
-             number: 80
-       path: /
-       pathType: Prefix
+  ingressClassName: alb  # 在此处添加 ingressClassName 字段
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: "nginx-1"
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
 ```
 
 
 #### 2.3.2 为nginx service创建ingress
 
 ```
-kubectl apply -f nginx-1.yaml
+$ kubectl apply -f nginx-1.yaml
 ```
 验证
 
 ```
-ALB=$(kubectl get ingress -o json | jq -r '.items[0].status.loadBalancer.ingress[].hostname')
+$ ALB=$(kubectl get ingress -o json | jq -r '.items[0].status.loadBalancer.ingress[].hostname')
 
-curl -m3 -v $ALB
+$ curl -m3 -v $ALB
 
-#如果遇到问题，请查看日志
-kubectl logs -n kube-system $(kubectl get po -n kube-system | egrep -o alb-ingress[a-zA-Z0-9-]+)
 ```
 
 #### 2.3.3 清理环境
 
 ```
-kubectl delete -f nginx-1.yaml
+$ kubectl delete -f nginx-1.yaml
 ```
