@@ -2,8 +2,8 @@
 
 --
 #### Contributer: Zhengyu Ren
-#### 更新时间: 2023-08-09
-#### 基于EKS版本: EKS 1.27
+#### 更新时间: 2024-11-04
+#### 基于EKS版本: EKS 1.31
 --
 
 
@@ -19,13 +19,13 @@
 * 使用 pip 安装
 
 ```
-pip install awscli
+$ pip install awscli
 ```
 检查版本:
 
 ```
 $ aws --version
-aws-cli/2.13.7 Python/3.11.4 Darwin/22.5.0 source/arm64 prompt/off
+aws-cli/2.15.25 Python/3.11.8 Darwin/24.1.0 exe/x86_64 prompt/off
 ```
 
 ### 1.2 Windows系统
@@ -36,7 +36,7 @@ Windows 系统下可以根据系统情况, 通过下载[64位](https://s3.amazon
 检查版本:
 
 ```
->aws --version
+$ aws --version
 aws-cli/2.13.7 Python/3.11.4 Windows/10 exe/AMD64 prompt/off
 ```
 
@@ -50,7 +50,7 @@ aws-cli/2.13.7 Python/3.11.4 Windows/10 exe/AMD64 prompt/off
 #配置aws cli的用户权限
 #具体区域设定以所需创建集群区域设置.
 #北京区为cn-north-1; 宁夏区为cn-northwest-1
-$aws configure
+$ aws configure
 AWS Access Key ID :
 AWS Secret Access Key :
 Default region name:
@@ -60,7 +60,7 @@ Default output format [None]:
 ### 1.4 测试权限
 
 ```
-aws sts get-caller-identity
+$ aws sts get-caller-identity
 # 如果可以正常返回以下内容(包含account id),则表示已经正确设置角色权限
 {
     "Account": "<your account id, etc.11111111>", 
@@ -77,22 +77,22 @@ aws sts get-caller-identity
 * 直接下载安装方式
 
 ```
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/eksctl /usr/local/bin
+$ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+$ sudo mv /tmp/eksctl /usr/local/bin
 ```
 
 * Brew安装
 
 ```
-brew tap weaveworks/tap
-brew install weaveworks/tap/eksctl
+$ brew tap weaveworks/tap
+$ brew install weaveworks/tap/eksctl
 ```
 
 ### 2.2 Linux系统安装
 
 ```
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/eksctl /usr/local/bin
+$ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+$ sudo mv /tmp/eksctl /usr/local/bin
 ```
 
 ### 2.3 Windows系统安装
@@ -102,7 +102,7 @@ sudo mv /tmp/eksctl /usr/local/bin
 ### 2.4 版本确认
 ```
 $eksctl version
-0.105.0-dev+aa76f1d4.2022-07-08T14:38:11Z
+0.193.0-dev+19cb88bf5.2024-10-18T12:39:39Z
 ```
 
 ## 3.kubectl
@@ -119,25 +119,27 @@ $eksctl version
 
 ```
 #Intel CPU
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl"
+$curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl"
 
 #Apple Sillicon
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/arm64/kubectl"
+$curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/arm64/kubectl"
 
 #调整权限, 并放置到推荐路径
-chmod +x ./kubectl
+$chmod +x ./kubectl
 
-sudo mv ./kubectl /usr/local/bin/kubectl
-sudo chown root: /usr/local/bin/kubectl
+$sudo mv ./kubectl /usr/local/bin/kubectl
+$sudo chown root: /usr/local/bin/kubectl
 
 #查询版本
-kubectl version --client
+$kubectl version --client
+Client Version: v1.29.4
+Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
 ```
 
 * 通过Brew安装
 
 ```
-brew install kubectl
+$ brew install kubectl
 ```
 
 ### 3.2 Linux系统安装
@@ -146,9 +148,9 @@ brew install kubectl
 * 直接下载
 
 ```
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+$ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+$ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 ```
 
 ### 3.3 Windows系统安装
