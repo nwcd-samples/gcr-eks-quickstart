@@ -1,8 +1,8 @@
 # Demo12-使用CodePipeline进行CICD
 --
 #### Contributor: Zhengyu Ren
-#### 更新时间: 2023-08-09
-#### 基于EKS版本: EKS 1.27
+#### 更新时间: 2024-11-04
+#### 基于EKS版本: EKS 1.31
 --
 ## 1. 创建IAM 角色
 在AWS CodePipeline中, 我们将使用AWS CodeBuild部署示例Kubernetes服务。
@@ -10,12 +10,12 @@
 <br>在此步骤中, 我们将创建一个IAM角色, 并添加一个内联策略, 我们将在CodeBuild阶段使用该策略, 通过kubectl与EKS集群交互。
 
 ```
-ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-REGION="cn-northwest-1"
+$ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+$ REGION="cn-northwest-1"
 
-TRUST="{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\", \"Principal\": { \"AWS\": \"arn:aws-cn:iam::${ACCOUNT_ID}:root\" }, \"Action\": \"sts:AssumeRole\" } ] }"
+$ TRUST="{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Effect\": \"Allow\", \"Principal\": { \"AWS\": \"arn:aws-cn:iam::${ACCOUNT_ID}:root\" }, \"Action\": \"sts:AssumeRole\" } ] }"
 
-cat << EOF >  iam-role-policy
+$ cat << EOF >  iam-role-policy
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -28,10 +28,10 @@ cat << EOF >  iam-role-policy
 }
 EOF
 
-aws iam create-role --role-name EksWorkshopCodeBuildKubectlRole \
+$ aws iam create-role --role-name EksWorkshopCodeBuildKubectlRole \
 --assume-role-policy-document "$TRUST" --output text --query 'Role.Arn'
 
-aws iam put-role-policy --role-name EksWorkshopCodeBuildKubectlRole \
+$ aws iam put-role-policy --role-name EksWorkshopCodeBuildKubectlRole \
 --policy-name eks-describe --policy-document file://iam-role-policy
 ```
 
@@ -40,12 +40,12 @@ aws iam put-role-policy --role-name EksWorkshopCodeBuildKubectlRole \
 <br>一旦ConfigMap包含此新角色, 管道CodeBuild阶段的kubectl将能够通过IAM角色与EKS集群交互。
 
 ```
-ROLE="    - rolearn: arn:aws-cn:iam::${ACCOUNT_ID}:role/EksWorkshopCodeBuildKubectlRole\n      username: build\n      groups:\n        - system:masters"
+$ ROLE="    - rolearn: arn:aws-cn:iam::${ACCOUNT_ID}:role/EksWorkshopCodeBuildKubectlRole\n      username: build\n      groups:\n        - system:masters"
 
-kubectl get -n kube-system configmap/aws-auth -o yaml \
+$ kubectl get -n kube-system configmap/aws-auth -o yaml \
  | awk "/mapRoles: \|/{print;print \"$ROLE\";next}1" > aws-auth-patch.yml
 
-kubectl patch configmap/aws-auth -n kube-system \
+$ kubectl patch configmap/aws-auth -n kube-system \
 --patch "$(cat aws-auth-patch.yml)"
 ```
 ## 3. 下载示例代码并上传到CodeCommit
@@ -54,46 +54,46 @@ kubectl patch configmap/aws-auth -n kube-system \
 示例仓库: [https://github.com/rnzsgh/eks-workshop-sample-api-service-go.git](https://github.com/rnzsgh/eks-workshop-sample-api-service-go.git)
 
 ```
-git clone https://github.com/rnzsgh/eks-workshop-sample-api-service-go.git
+$ git clone https://github.com/rnzsgh/eks-workshop-sample-api-service-go.git
 ```
 
 
 ### 3.2 创建ECR
 ```
-aws ecr create-repository --repository-name eksworkshop-codepipeline
+$ aws ecr create-repository --repository-name eksworkshop-codepipeline
 ```
 
 ### 3.3 创建CodeCommit
 ```
-aws codecommit create-repository --repository-name \
+$ aws codecommit create-repository --repository-name \
 eks-workshop-sample-api-service-go --repository-description "EKS Workshop CodeCommit"
 ```
 
 ### 3.4 上传下载的github的示例到CodeCommit
 ```
-cd eks-workshop-sample-api-service-go
+$ cd eks-workshop-sample-api-service-go
 
 # 初始化
-git init
+$ git init
 
 # 添加跟踪
-git add .
+$ git add .
 
 # 提交本地版本库
-git commit -m 'codepipeline'
+$ git commit -m 'codepipeline'
 
 # 建立远程连接
-git remote add orgin \
+$ git remote add orgin \
 --no-tags https://git-codecommit.cn-northwest-1.amazonaws.com.cn/v1/repos/eks-workshop-sample-api-service-go
 
 # 分支合并至main
-git branch -m main
+$ git branch -m main
 
 # 查看状态
-git status
+$ git status
 
 # 推送
-git push orgin main
+$ git push orgin main
 ```
 
 控制台中CodeCommit的界面可以看到已经成功上传完成
@@ -104,7 +104,7 @@ git push orgin main
 ### 4.1 生成CodeBuild所需的IAM Policy文件
 
 ```
-cat << EOF > code_build.json
+$ cat << EOF > code_build.json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -157,19 +157,19 @@ EOF
 
 ```
 # 配置CodeBuild的信任策略
-CODEBUILD_TRUST="{\"Version\": \"2012-10-17\",\"Statement\": [{\"Effect\": \"Allow\",\"Principal\": {\"Service\": \"codebuild.amazonaws.com\"},\"Action\": \"sts:AssumeRole\"}]}"
+$ CODEBUILD_TRUST="{\"Version\": \"2012-10-17\",\"Statement\": [{\"Effect\": \"Allow\",\"Principal\": {\"Service\": \"codebuild.amazonaws.com\"},\"Action\": \"sts:AssumeRole\"}]}"
 
 # 配置CodeBuild的角色
-aws iam create-role --role-name EksWorkshopCodeBuild \
+$ aws iam create-role --role-name EksWorkshopCodeBuild \
 --assume-role-policy-document "$CODEBUILD_TRUST" \
 --output text --query 'Role.Arn'
 
 # 配置CodeBuild对应的IAM策略
-aws iam put-role-policy --role-name EksWorkshopCodeBuild \
+$ aws iam put-role-policy --role-name EksWorkshopCodeBuild \
  --policy-name codebuild --policy-document file://code_build.json
 
 # 如下service-role需要改为创建的角色ARN
-aws codebuild create-project \
+$ aws codebuild create-project \
 --name "eksworkshop-codebuild" \
  --source "{\"type\": \"CODECOMMIT\",\"location\": \"https://git-codecommit.cn-northwest-1.amazonaws.com.cn/v1/repos/eks-workshop-sample-api-service-go\"}" \
  --artifacts {"\"type\": \"NO_ARTIFACTS\""} \
@@ -182,7 +182,7 @@ aws codebuild create-project \
 
 ```
 # 创建CodePipeline使用的IAM Policy文件
-cat << EOF > iam_codepipeline_policy.json
+$ cat << EOF > iam_codepipeline_policy.json
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -270,27 +270,27 @@ EOF
 
 # 创建S3存储桶
 **如下<S3_BUKCET>请自行设定一个名称**
-aws s3api create-bucket --bucket <S3_BUCKET> \
+$ aws s3api create-bucket --bucket <S3_BUCKET> \
  --region cn-northwest-1 \
  --create-bucket-configuration LocationConstraint=cn-northwest-1
 
 # 创建CodePipeline IAM角色的信任策略
-CODEPIPILINE_TRUST='{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Principal": {"Service": "codepipeline.amazonaws.com"},"Action": "sts:AssumeRole"}]}'
+$ CODEPIPILINE_TRUST='{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Principal": {"Service": "codepipeline.amazonaws.com"},"Action": "sts:AssumeRole"}]}'
 
 # 创建CodePipeline IAM角色
-aws iam create-role --role-name EksWorkshopCodePipleLine \
+$ aws iam create-role --role-name EksWorkshopCodePipleLine \
 --assume-role-policy-document "$CODEPIPILINE_TRUST" \
 --output text --query 'Role.Arn'
 
 # 绑定IAM Policy
-aws iam put-role-policy --role-name EksWorkshopCodePipleLine \
+$ aws iam put-role-policy --role-name EksWorkshopCodePipleLine \
 --policy-name codepipeline \
 --policy-document file://iam_codepipeline_policy.json
 
 # 创建CodePipeline的定义文件
 # 需要根据初始创建的S3桶更新如下Location-<S3_BUCKET>; 以及ACCOUNT_ID为当前账户信息
 # 需要将RoleARN改为测试环境的ARN
-cat << EOF > codepipeline.json
+$ cat << EOF > codepipeline.json
 {
   "pipeline": {
     "name": "eksworkshop-codepipleline",
@@ -366,7 +366,7 @@ cat << EOF > codepipeline.json
 EOF
 
 # 创建pipeline
-aws codepipeline create-pipeline --cli-input-json file://codepipeline.json
+$ aws codepipeline create-pipeline --cli-input-json file://codepipeline.json
 ```
 **此时可以登陆控制台或CLI查看CodePipeline的情况, 正常情况下会有一个正常执行中的操作**
 
@@ -386,44 +386,44 @@ res := &response{Message: "Hello World from Zeno"}
 提交同步
 
 ```
-cd eks-workshop-sample-api-service-go
+$ cd eks-workshop-sample-api-service-go
 
-git add .
+$ git add .
 
-git commit -m 'change message text'
+$ git commit -m 'change message text'
 
-git push orgin main
+$ git push orgin main
 ```
 
 ## 7. 清理环境
 ```
 # 删除Pipeline
-aws codepipeline delete-pipeline \
+$ aws codepipeline delete-pipeline \
 --name $(aws codepipeline list-pipelines --query 'pipelines[].name' --output text)
 
 # 删除CodeBuild项目
-aws codebuild delete-project \
+$ aws codebuild delete-project \
 --name $(aws codebuild list-projects --query 'projects' --output text)
 
 # 删除CodeCommit Repository
-aws codecommit delete-repository \
+$ aws codecommit delete-repository \
 --repository-name $(aws codecommit list-repositories --query 'repositories[].repositoryName' --output text)
 
 # 删除ECR Repository
-aws ecr delete-repository \
+$ aws ecr delete-repository \
 --repository-name eksworkshop-codepipeline --force
 
 # 删除S3存储桶
-aws s3 rm s3://<S3_BUCKET> --recursive
-aws s3api delete-bucket --region cn-northwest-1 --bucket <S3_BUCKET>
+$ aws s3 rm s3://<S3_BUCKET> --recursive
+$ aws s3api delete-bucket --region cn-northwest-1 --bucket <S3_BUCKET>
 
 # 删除IAM Role关联的Inline Policy
-aws iam delete-role-policy --role-name EksWorkshopCodeBuild --policy-name codebuild
-aws iam delete-role-policy --role-name EksWorkshopCodeBuildKubectlRole --policy-name eks-describe
-aws iam delete-role-policy --role-name EksWorkshopCodePipleLine --policy-name codepipeline
+$ aws iam delete-role-policy --role-name EksWorkshopCodeBuild --policy-name codebuild
+$ aws iam delete-role-policy --role-name EksWorkshopCodeBuildKubectlRole --policy-name eks-describe
+$ aws iam delete-role-policy --role-name EksWorkshopCodePipleLine --policy-name codepipeline
 
 # 删除IAM Role
-aws iam delete-role --role-name EksWorkshopCodeBuild
-aws iam delete-role --role-name EksWorkshopCodeBuildKubectlRole
-aws iam delete-role --role-name EksWorkshopCodePipleLine
+$ aws iam delete-role --role-name EksWorkshopCodeBuild
+$ aws iam delete-role --role-name EksWorkshopCodeBuildKubectlRole
+$ aws iam delete-role --role-name EksWorkshopCodePipleLine
 ```
