@@ -23,7 +23,7 @@ CLUSTER_NAME=eksworkshop
 #参数说明
 #--node-type 工作节点类型 默认为m5.large
 #--nodes 工作节点数量 默认为2
-#--version 这里以1.27版本为例
+#--version 这里以1.31版本为例
 
 $ eksctl create cluster --name=${CLUSTER_NAME} --node-type t3.medium --managed --alb-ingress-access --region=${AWS_REGION} --version 1.31
 ```
