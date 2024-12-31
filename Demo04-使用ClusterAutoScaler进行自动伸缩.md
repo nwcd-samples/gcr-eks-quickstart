@@ -268,17 +268,17 @@ kubectl get pods -l app=nginx -o wide --watch
 输出显示：
 
 ```
-NAME                                 READY   STATUS    RESTARTS   AGE
-nginx-to-scaleout-6fcd49fb84-78tv2   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-8n5tz   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-b6kpf   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-ghcrk   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-gk4r9   0/1     Pending   0          21s
-nginx-to-scaleout-6fcd49fb84-hhs5z   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-kcl5t   1/1     Running   0          4m48s
-nginx-to-scaleout-6fcd49fb84-x5nwg   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-z7plg   1/1     Running   0          21s
-nginx-to-scaleout-6fcd49fb84-z8ltm   1/1     Running   0          21s
+NAME                                 READY   STATUS    RESTARTS   AGE   IP               NODE                                                 NOMINATED NODE   READINESS GATES
+nginx-to-scaleout-7cfb655fb5-9ht4k   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-dsmhk   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-hrnpb   1/1     Running   0          26s   192.168.189.41   ip-192-168-164-140.cn-northwest-1.compute.internal   <none>           <none>
+nginx-to-scaleout-7cfb655fb5-ld2k7   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-pn2gz   1/1     Running   0          5s    192.168.160.46   ip-192-168-164-140.cn-northwest-1.compute.internal   <none>           <none>
+nginx-to-scaleout-7cfb655fb5-qf5l9   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-v6jnz   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-v8fzq   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-vjsxs   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
+nginx-to-scaleout-7cfb655fb5-x4bsl   0/1     Pending   0          5s    <none>           <none>                                               <none>           <none>
 ```
 ### 4.4 观察cluster-autoscaler logs & nodes
 
