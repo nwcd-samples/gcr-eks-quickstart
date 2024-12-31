@@ -1,8 +1,8 @@
 # Demo04-使用Cluster Autoscaler进行自动伸缩
 --
 #### Contributor: Tao Dai
-#### 更新时间: 2023-09-19
-#### 基于EKS版本: EKS 1.27
+#### 更新时间: 2024-12-31
+#### 基于EKS版本: EKS 1.31
 --
 
 Cluster Autoscaler（CA）集群自动伸缩与Auto Scaling groups集成，CA给客户提供了四种部署的方式：
@@ -84,6 +84,8 @@ aws autoscaling \
 ### 2.1 为集群service account 开启IAM roles（IRSA）
 
 ```
+aws configure set default.region cn-northwest-1
+
 eksctl utils associate-iam-oidc-provider \
     --cluster test \
     --approve
@@ -92,10 +94,8 @@ eksctl utils associate-iam-oidc-provider \
 输出显示：
 
 ```
-2022-07-11 09:54:47 [ℹ]  eksctl version 0.90.0
-2022-07-11 09:54:47 [ℹ]  using region cn-northwest-1
-2022-07-11 09:54:48 [ℹ]  will create IAM Open ID Connect provider for cluster "test" in "cn-northwest-1"
-2022-07-11 09:54:48 [✔]  created IAM Open ID Connect provider for cluster "test" in "cn-northwest-1"
+2024-12-31 07:29:28 [ℹ]  will create IAM Open ID Connect provider for cluster "test" in "cn-northwest-1"
+2024-12-31 07:29:28 [✔]  created IAM Open ID Connect provider for cluster "test" in "cn-northwest-1"
 ```
 
 ### 2.2 创建service account的IAM policy，用于CA pod与ASG进行交互
@@ -129,31 +129,13 @@ aws iam create-policy   \
   --policy-document file://~/cluster-autoscaler/k8s-asg-policy.json
 ```
 
-输出显示：
-
-```
-{
-    "Policy": {
-        "PolicyName": "k8s-asg-policy",
-        "PolicyId": "ANPAXCZ56Y5GOG3ZVSGPJ",
-        "Arn": "arn:aws-cn:iam::1234567890:policy/k8s-asg-policy",
-        "Path": "/",
-        "DefaultVersionId": "v1",
-        "AttachmentCount": 0,
-        "PermissionsBoundaryUsageCount": 0,
-        "IsAttachable": true,
-        "CreateDate": "2022-07-11T01:58:19+00:00",
-        "UpdateDate": "2022-07-11T01:58:19+00:00"
-    }
-}
-```
 ### 2.3 为在kube-system namespace内的cluster-autoscaler Service Account创建IAM role
 
 ```
 eksctl create iamserviceaccount \
     --name cluster-autoscaler \
     --namespace kube-system \
-    --cluster eks0707 \
+    --cluster test \
     --attach-policy-arn "arn:aws-cn:iam::1234567890:policy/k8s-asg-policy" \
     --approve \
     --override-existing-serviceaccounts
@@ -162,19 +144,17 @@ eksctl create iamserviceaccount \
 输出显示：
 
 ```
-2022-07-11 10:26:01 [ℹ]  eksctl version 0.157.0
-2022-07-11 10:26:01 [ℹ]  using region cn-northwest-1
-2022-07-11 10:26:02 [ℹ]  1 iamserviceaccount (kube-system/cluster-autoscaler) was included (based on the include/exclude rules)
-2022-07-11 10:26:02 [!]  metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set
-2022-07-11 10:26:02 [ℹ]  1 task: {
-    2 sequential sub-tasks: {
+2024-12-31 07:33:41 [ℹ]  1 iamserviceaccount (kube-system/cluster-autoscaler) was included (based on the include/exclude rules)
+2024-12-31 07:33:41 [!]  metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set
+2024-12-31 07:33:41 [ℹ]  1 task: { 
+    2 sequential sub-tasks: { 
         create IAM role for serviceaccount "kube-system/cluster-autoscaler",
         create serviceaccount "kube-system/cluster-autoscaler",
-    } }2022-07-11 10:26:02 [ℹ]  building iamserviceaccount stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
-2022-07-11 10:26:03 [ℹ]  deploying stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
-2022-07-11 10:26:03 [ℹ]  waiting for CloudFormation stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
-2022-07-11 10:26:21 [ℹ]  waiting for CloudFormation stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
-2022-07-11 10:26:23 [ℹ]  created serviceaccount "kube-system/cluster-autoscaler"
+    } }2024-12-31 07:33:41 [ℹ]  building iamserviceaccount stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
+2024-12-31 07:33:41 [ℹ]  deploying stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
+2024-12-31 07:33:41 [ℹ]  waiting for CloudFormation stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
+2024-12-31 07:34:11 [ℹ]  waiting for CloudFormation stack "eksctl-test-addon-iamserviceaccount-kube-system-cluster-autoscaler"
+2024-12-31 07:34:12 [ℹ]  created serviceaccount "kube-system/cluster-autoscaler"
 ```
 查看sa信息
 
@@ -189,8 +169,8 @@ Namespace:           kube-system
 Labels:              app.kubernetes.io/managed-by=eksctl
 Annotations:         eks.amazonaws.com/role-arn: arn:aws-cn:iam::1234567890:role/eksctl-test-addon-iamserviceaccount-kube-Role1-17T56JSDQ7VAL
 Image pull secrets:  <none>
-Mountable secrets:   cluster-autoscaler-token-rjfxh
-Tokens:              cluster-autoscaler-token-rjfxh
+Mountable secrets:   <none>
+Tokens:              <none>
 Events:              <none>
 ```
 
@@ -309,10 +289,13 @@ kubectl -n kube-system logs -f deployment/cluster-autoscaler
 输出显示：
 
 ```
-I0711 07:51:04.747329       1 flags.go:52] FLAG: --new-pod-scale-up-delay="0s"
-I0711 07:51:04.747577       1 flags.go:52] FLAG: --scale-up-from-zero="true"
-I0711 07:51:44.281156       1 scale_up.go:586] Final scale-up plan: [{eks-nodegroup-0ec0ebf0-fa82-89de-7f5f-f4dbdd42bee4 3->4 (max: 8)}]
-I0711 07:51:44.428350       1 event_sink_logging_wrapper.go:48] Event(v1.ObjectReference{Kind:"Pod", Namespace:"default", Name:"nginx-to-scaleout-6fcd49fb84-mxflx", UID:"38d06f84-bba8-49d3-b7a5-736f7487f8f1", APIVersion:"v1", ResourceVersion:"986308", FieldPath:""}): type: 'Normal' reason: 'TriggeredScaleUp' pod triggered scale-up: [{eks-nodegroup-0ec0ebf0-fa82-89de-7f5f-f4dbdd42bee4 2->4 (max: 8)}]
+I1231 07:47:37.367440       1 waste.go:57] Expanding Node Group eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd would waste 33.33% CPU, 82.52% Memory, 57.93% Blended
+I1231 07:47:37.367468       1 scale_up.go:468] Best option to resize: eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd
+I1231 07:47:37.367480       1 scale_up.go:472] Estimated 3 nodes needed in eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd
+I1231 07:47:37.367503       1 scale_up.go:586] Final scale-up plan: [{eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd 1->4 (max: 4)}]
+I1231 07:47:37.367524       1 scale_up.go:675] Scale-up: setting group eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd size to 4
+I1231 07:47:37.367565       1 auto_scaling_groups.go:219] Setting asg eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd size to 4
+I1231 07:47:37.367772       1 event_sink_logging_wrapper.go:48] Event(v1.ObjectReference{Kind:"ConfigMap", Namespace:"kube-system", Name:"cluster-autoscaler-status", UID:"af30e9a5-8f8d-4e95-9d87-9bdd06238c4f", APIVersion:"v1", ResourceVersion:"7522", FieldPath:""}): type: 'Normal' reason: 'ScaledUpGroup' Scale-up: setting group eks-ng-public-2aca0dc5-68b2-7ad0-1f9b-8a4f041dfbdd size to 4
 ```
 
 ```
@@ -323,10 +306,10 @@ kubectl get nodes
 
 ```
 NAME                                                STATUS   ROLES    AGE    VERSION
-ip-192-168-105-113.cn-northwest-1.compute.internal   Ready    <none>   40m   v1.27.4-eks-8ccc7ba
-ip-192-168-157-4.cn-northwest-1.compute.internal     Ready    <none>   93s   v1.27.4-eks-8ccc7ba
-ip-192-168-157-50.cn-northwest-1.compute.internal    Ready    <none>   93s   v1.27.4-eks-8ccc7ba
-ip-192-168-172-39.cn-northwest-1.compute.internal    Ready    <none>   40m   v1.27.4-eks-8ccc7ba
+ip-192-168-121-15.cn-northwest-1.compute.internal    Ready    <none>   119s   v1.31.3-eks-59bf375
+ip-192-168-128-212.cn-northwest-1.compute.internal   Ready    <none>   114s   v1.31.3-eks-59bf375
+ip-192-168-129-81.cn-northwest-1.compute.internal    Ready    <none>   118s   v1.31.3-eks-59bf375
+ip-192-168-164-140.cn-northwest-1.compute.internal   Ready    <none>   41m    v1.31.3-eks-59bf375
 ```
 ## 5. 清除环境
 
