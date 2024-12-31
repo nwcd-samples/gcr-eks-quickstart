@@ -1,8 +1,8 @@
 # Demo09-使用IAM Role for Service Account(IRSA)
 --
-#### Contributor: Yi Zheng
-#### 更新时间: 2023-10-18
-#### 基于EKS版本: EKS 1.27
+#### Contributor: Tao Dai
+#### 更新时间: 2024-12-31
+#### 基于EKS版本: EKS 1.31
 --
 
 ## 1. 先决条件  
@@ -19,10 +19,6 @@ CLUSTER_NAME=eksworkshop
 使用eksctl 创建service account  
 
 ```
-AWS_REGION=cn-northwest-1
-AWS_DEFAULT_REGION=cn-northwest-1
-CLUSTER_NAME=eksworkshop
-
 # 执行以下命令创建OpenID Connect (OIDC) 身份提供商
 eksctl utils associate-iam-oidc-provider --cluster=${CLUSTER_NAME} --approve --region ${AWS_REGION}
 
@@ -36,7 +32,8 @@ eksctl create iamserviceaccount --name s3-echoer --namespace default \
 
 ```
 # 设置环境变量TARGET_BUCKET,Pod访问的S3 bucket
-TARGET_BUCKET=eksworkshop-irsa-2022-renew
+TARGET_BUCKET=irsa-2024-renew
+
 if [ $(aws s3 ls | grep $TARGET_BUCKET | wc -l) -eq 0 ]; then
     aws s3api create-bucket  --bucket $TARGET_BUCKET  --create-bucket-configuration LocationConstraint=$AWS_REGION  --region $AWS_REGION
 else
@@ -69,10 +66,11 @@ kubectl apply -f ~/job-s3.yaml
 kubectl logs [pod name]
 
 # 参考输出
-2022-07-12 23:35:06 eksworkshop-irsa-2022-renew
+2024-12-31 08:57:25 irsa-2024-renew
 ```
 
 ## 4. 清理环境
 ```
 kubectl delete -f ~/job-s3.yaml
+eksctl delete iamserviceaccount s3-echoer --cluster ${CLUSTER_NAME}
 ```
