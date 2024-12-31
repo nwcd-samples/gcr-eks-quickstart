@@ -1,8 +1,8 @@
 # Demo07-使用EBS CSI部署有状态应用
 --
 #### Contributor: Tao Dai
-#### 更新时间: 2024-01-18
-#### 基于EKS版本: EKS 1.28
+#### 更新时间: 2024-12-31
+#### 基于EKS版本: EKS 1.31
 
 ### 先决条件
 为集群创建IAM OIDC提供商
@@ -23,7 +23,7 @@ eksctl create iamserviceaccount \
     --cluster $CLUSTER_NAME \
     --role-name AmazonEKS_EBS_CSI_DriverRole \
     --role-only \
-    --attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+    --attach-policy-arn arn:aws-cn:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
     --approve
 ```
 ### 2.部署EBS CSI Driver插件
@@ -42,8 +42,8 @@ eksctl create addon \
 
 ```
 eksctl get addon --name aws-ebs-csi-driver --cluster test
-NAME                    VERSION                 STATUS  ISSUES  IAMROLE                                                         UPDATE AVAILABLE        CONFIGURATION VALUES
-aws-ebs-csi-driver      v1.22.0-eksbuild.2      ACTIVE  0       arn:aws-cn:iam::1234567890:role/AmazonEKS_EBS_CSI_DriverRole
+NAME                    VERSION                 STATUS  ISSUES  IAMROLE                                                         UPDATE AVAILABLE        CONFIGURATION VALUES    POD IDENTITY ASSOCIATION ROLES
+aws-ebs-csi-driver      v1.37.0-eksbuild.1      ACTIVE  0       arn:aws-cn:iam::150430853770:role/AmazonEKS_EBS_CSI_DriverRole
 ```
 
 ### 3.部署示例应用程序进行验证
@@ -51,6 +51,7 @@ aws-ebs-csi-driver      v1.22.0-eksbuild.2      ACTIVE  0       arn:aws-cn:iam::
 3.1 将EBS CSI驱动程序Github项目克隆到本地
 
 ```
+sudo yum install git -y
 git clone https://github.com/kubernetes-sigs/aws-ebs-csi-driver.git
 ```
 
@@ -70,8 +71,8 @@ kubectl apply -f manifests/
 
 ```
 kubectl get sc,pv | grep ebs
-storageclass.storage.k8s.io/ebs-sc (default)   ebs.csi.aws.com   Delete          WaitForFirstConsumer   false                  3h37m
-persistentvolume/pvc-d36f352d-db1b-4130-88cf-7e8ce9944bba   4Gi        RWO            Delete           Bound    default/ebs-claim   ebs-sc                  3h37m
+storageclass.storage.k8s.io/ebs-sc   ebs.csi.aws.com         Delete          WaitForFirstConsumer   false                  5s
+storageclass.storage.k8s.io/gp2      kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   false                  90m
 ```
 
 3.5 删除旧的默认StorageClass
@@ -90,11 +91,12 @@ kubectl patch sc ebs-sc -p '{"metadata": {"annotations":{"storageclass.kubernete
 
 ```
 kubectl exec -it app -- cat /data/out.txt
-Wed Jul 6 07:17:31 UTC 2022
-Wed Jul 6 07:17:36 UTC 2022
-Wed Jul 6 07:17:41 UTC 2022
-Wed Jul 6 07:17:46 UTC 2022
-Wed Jul 6 07:17:51 UTC 2022
+Tue Dec 31 08:43:17 UTC 2024
+Tue Dec 31 08:43:22 UTC 2024
+Tue Dec 31 08:43:27 UTC 2024
+Tue Dec 31 08:43:32 UTC 2024
+Tue Dec 31 08:43:37 UTC 2024
+Tue Dec 31 08:43:42 UTC 2024
 ```
 ### 4.清理环境
 
