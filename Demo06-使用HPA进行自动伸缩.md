@@ -1,8 +1,8 @@
 # Demo06-使用HPA进行自动伸缩
 --
 #### Contributor: Tao Dai
-#### 更新时间: 2023-09-19
-#### 基于EKS版本: EKS 1.27
+#### 更新时间: 2024-12-31
+#### 基于EKS版本: EKS 1.31
 --
 
 Metrics Server是Kubernetes内置自动缩放pipelines的可扩展、高效的容器资源指标来源,这些指标将推动部署的扩展行为,我们将使用 Kubernetes Metrics Server部署指标服务器。
@@ -14,23 +14,11 @@ Metrics Server是Kubernetes内置自动缩放pipelines的可扩展、高效的�
 a. 下载metrics-server安装文件到本地：
 
 ```
-wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.6.4/components.yaml
+wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 
-b. 使用Kubernetes mutating admission webhook自动更换Kubernetes Pod的容器镜像
-
-```
-kubectl apply -f https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
-```
-注：如果不成功，可以在浏览器直接输入
-
-```
-https://raw.githubusercontent.com/nwcdlabs/container-mirror/master/webhook/mutating-webhook.yaml
-```
-将yaml文件的内容复制保存到本地，生成mutating-webhook.yaml；
-
-c. 将Image更新为Public ECR中1.27支持的最新版本：
-<br>public.ecr.aws/eks-distro/kubernetes-sigs/metrics-server:v0.6.4-eks-1-27-latest
+b. 将Image更新为Public ECR中1.27支持的最新版本：
+<br>public.ecr.aws/eks-distro/kubernetes-sigs/metrics-server:v0.7.2-eks-1-32-3
 <br>并安装metrics-server
 ```
 kubectl apply -f components.yaml
@@ -63,7 +51,7 @@ kubectl get apiservice v1beta1.metrics.k8s.io -o json | jq '.status'
 {
   "conditions": [
     {
-      "lastTransitionTime": "2023-09-19T12:46:19Z",
+      "lastTransitionTime": "2024-12-31T08:07:49Z",
       "message": "all checks passed",
       "reason": "Passed",
       "status": "True",
@@ -197,7 +185,7 @@ php-apache-5b8f57879d-sfngd   1/1     Running   0          11m
 php-apache-5b8f57879d-xvffh   1/1     Running   0          79s
 ```
 
-停止load test 使用 Ctrl + C，退出load test 使用 Ctrl + D，hpa会慢慢将pod的数量降至最小数量1。
+停止load test 使用 Ctrl + C，退出load test 使用 Ctrl + D，hpa会慢慢将pod的数量降至最小数量1(缩放时间默认是5分钟，因此需要等待5分钟pod数量才会降到1)。
 
 ## 4. 清理环境
 
