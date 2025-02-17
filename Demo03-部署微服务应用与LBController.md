@@ -1,7 +1,7 @@
 # Demo03-部署微服务应用与Amazon Load Balancer Controller
 --
 #### Contributor: Zhengyu Ren
-#### 更新时间: 2023-11-04
+#### 更新时间: 2024-11-04
 #### 基于EKS版本: EKS 1.31
 --
 
